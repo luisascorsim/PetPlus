@@ -1,0 +1,134 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff;
+    color: #2c1414;
+    overflow-x: hidden; /* ADICIONAR isso para evitar scroll lateral */
+}
+
+/* Cabeçalho */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #b7cde2;
+    padding: 5px 20px;
+
+}
+
+.logo img {
+    height: 60px;
+}
+
+nav .btn {
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-decoration: none;
+    margin-left: 10px;
+}
+
+.login {
+    color: #ffffff;
+    background-color: #0D3B66;
+    font-family: Tahoma, sans-serif; 
+    font-weight: 600;
+    
+    
+}
+
+.cadastro {
+    color: #ffffff;
+    background-color: #2196F3;
+    font-family: Tahoma, sans-serif; 
+    font-weight: 600;
+}
+
+
+.container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 90vh;
+    padding-left: 60px;
+  }
+  
+  .texto {
+    max-width: 60%;
+    line-height: 1.5
+  }
+  
+  .texto h1 {
+    font-size: 60px;
+    color: #2c1414;
+  }
+  
+  .azul {
+    color: #0088ff;
+    text-decoration: none;
+  }
+  .sublinhado {
+    text-decoration: underline;
+    text-decoration-color: #0088ff; 
+    text-decoration-thickness: 6px; 
+    text-underline-offset: 9px;     
+}
+  .texto p {
+    font-size: 26px;
+    color: #2c1414;
+    line-height: 1.9;
+  }
+  
+  .imagem-fundo {
+    position: absolute;
+    right: -1px; 
+    top: 10;
+    height: 100%;
+    opacity: 0.9;
+    object-fit: contain;
+    pointer-events: none;
+  
+  }
+
+.funcionalidades {
+    background-color: #ffffff;
+    text-align: center;
+    padding: 50px 50px;
+}
+
+.funcionalidades h3 {
+    font-size: 30px;
+    color: #007bff;
+    margin-bottom: 50px;
+}
+
+.subtitulo {
+    font-weight: bold;
+    font-size: 26px;
+}
+
+.gerenciar {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+ul {
+    max-width: 900px;
+    margin: 50px auto 0;
+    text-align: left;
+    font-size: 20px;
+    color: #0D3B66;
+}
+
+ul li {
+    align-items: center;
+    padding: 1.2px;
+    margin-bottom: 10px;
+    list-style-type: none;
+    border-radius: 5px;
+    line-height: 1.9
+    
+}

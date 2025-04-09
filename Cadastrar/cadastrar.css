@@ -1,0 +1,98 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  body, html {
+    height: 100%;
+  }
+  
+  .fundo {
+    background-color: #ffffff;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .card {
+    background-color: #cde0f1;
+    border-radius: 15px;
+    padding: 40px 30px;
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+    box-shadow: 0 2px 8px #0000001a;
+  }
+  
+  .logo {
+    display: block;
+    margin: 0 auto 15px;
+    width: 90px;
+  }
+  
+  h2 {
+    text-align: center;
+    color: #003b66;
+    margin-bottom: 30px;
+    font-size: 20px;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  label {
+    margin-bottom: 5px;
+    color: #003b66;
+    font-weight: bold;
+  }
+  
+  input {
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 14px;
+  }
+  
+  button {
+    background-color: #003b66;
+    color: white;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  button:hover {
+    background-color: #002b4d;
+  }
+  
+  .login-link {
+    text-align: center;
+    font-size: 13px;
+    margin-top: 20px;
+  }
+  
+  .login-link a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  
+  .botao-voltar {
+    position: absolute;
+    top: 30px;
+    left: 30px; 
+  }
+
+  .icone-botao {
+    width: 30px;
+    height: 30px;
+  }
