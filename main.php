@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <title>Inicio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <style>
+body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      background-color: #b7cde2;
+    }
+
+    .navbar-brand {
+      font-weight: bold;
+      color: #0D3B66 !important;
+      font-size: 24px;
+    }
+
+    .logo img {
+      height: 60px;
+    }
+
+    .btn-login {
+      background-color: #0D3B66;
+      color: #fff;
+      font-weight: 600;
+      font-family: Tahoma, sans-serif;
+    }
+
+    .btn-login:hover {
+      background-color: #0D3B66;
+    }
+
+    .btn-cadastro {
+      background-color: #2196F3;
+      color: #fff;
+      font-weight: 600;
+      font-family: Tahoma, sans-serif;
+    }
+
+    .btn-cadastro:hover {
+      background-color: #1976D2;
+    }
+
+    .container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-height: 90vh;
+      padding-left: 60px;
+    }
+
+    .texto {
+      max-width: 60%;
+      line-height: 1.5;
+    }
+
+    .texto h1 {
+      font-size: 60px;
+      color: #2c1414;
+    }
+
+    .azul {
+      color: #0088ff;
+      text-decoration: none;
+    }
+
+    .sublinhado {
+      text-decoration: underline;
+      text-decoration-color: #0088ff;
+      text-decoration-thickness: 6px;
+      text-underline-offset: 9px;
+    }
+
+    .texto p {
+      font-size: 26px;
+      color: #2c1414;
+      line-height: 1.9;
+    }
+
+    .imagem-fundo {
+      position: absolute;
+      right: -70px;
+      top: 10px;
+      height: 100%;
+      opacity: 0.9;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    .funcionalidades {
+      background-color: #ffffff;
+      text-align: center;
+      padding: 50px;
+    }
+
+    .funcionalidades h3 {
+      font-size: 30px;
+      color: #007bff;
+      margin-bottom: 50px;
+    }
+
+    .subtitulo {
+      font-weight: bold;
+      font-size: 26px;
+    }
+
+    .gerenciar {
+      color: #007bff;
+      text-decoration: none;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    ul {
+      max-width: 900px;
+      margin: 50px auto 0;
+      text-align: left;
+      font-size: 20px;
+      color: #0D3B66;
+    }
+
+    ul li {
+      padding: 1.2px;
+      margin-bottom: 10px;
+      list-style-type: none;
+      border-radius: 5px;
+      line-height: 1.9;
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-sm">
+    <div class="container-fluid">
+      <!-- Logo e nome -->
+      <div class="d-flex align-items-center">
+        <div class="logo me-2">
+          <img src="logo.png" alt="PetPlus Logo">
+        </div>
+        <a class="navbar-brand" href="index.php"></a>
+      </div>
+
+      <!-- Botões à direita -->
+      <div class="ms-auto d-flex">
+        <a href="login.php?page=1" class="btn btn-login me-2">Login</a>
+        <a href="cadastre-se.php?page=2" class="btn btn-cadastro">Cadastre-se</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+        <section class="intro">
+            <div class="container">
+                <div class="texto">
+                    <h1>Mais organizado, <br> mais cuidado, <span class="azul sublinhado">PetPlus</span></h1>
+                  <p>O PetPlus é um sistema desenvolvido com o objetivo de <br> facilitar o gerenciamento e organização de informações<br> em clínicas veterinárias. Pensado para otimizar o dia <br> a dia de profissionais da área.</p>
+                </div>
+                <img src="cachorroegato.png" class="imagem-fundo">
+              </div>
+        </section>
+
+        <section class="funcionalidades">
+            <h3>Funcionalidades</h3>
+            <p class="subtitulo">Tudo o que você precisa em um só lugar!</p>
+                <p class="gerenciar">Aqui você pode gerenciar tudo relacionado ao seu pet de forma simples e rápida.<br> Explore as funcionalidades abaixo para acessar o que precisa!</p>
+            <ul>
+
+                <li><strong>Cadastro e gerenciamento de fichas dos pets:</strong> Incluindo informações detalhadas como identificação, peso, vacinas e histórico de atendimentos.</li>
+                <li><strong>Agendamentos:</strong> Ferramenta eficiente para organizar consultas, exames e cirurgias, com alertas para facilitar o acompanhamento.</li>
+                <li><strong>Gestão de prontuários:</strong> Registro completo do histórico médico do pet, permitindo que os veterinários acessem rapidamente as informações necessárias.</li>
+                <li><strong>Painel administrativo:</strong> Permite que os gestores tenham controle sobre o funcionamento da clínica, com relatórios e visualização rápida dos dados.</li>
+            </ul>
+        </section>
+
+    </main>
+
+</body>
+</html>

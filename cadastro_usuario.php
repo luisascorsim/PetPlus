@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastros - PetPlus</title>
+<style>
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f5f7fa;
+}
+
+/*sidebar*/
+.sidebar {
+  width: 180px;
+  background-color: white;
+  border-right: 2px solid #003b66;
+  padding: 20px 10px;
+  color: #003b66;
+  font-weight: bold;
+  position: fixed;
+  top: 60px;
+  bottom: 0;
+  left: 0;
+}
+
+.sidebar img {
+  width: 100px;
+  margin: 0 auto 20px;
+  display: block;
+}
+
+.sidebar button {
+  width: 100%;
+  background-color: #003b66;
+  color: white;
+  border: none;
+  padding: 10px 0;
+  margin: 8px 0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.sidebar button:hover {
+  background-color: #00294d;
+}
+
+/*header*/
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 60px;
+  width: 100%;
+  background-color: #2196f3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  color: white;
+  z-index: 1000;
+}
+
+.header .logo {
+  height: 40px;
+}
+
+.header .user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header .user-info img {
+  width: 24px;
+  cursor: pointer;
+}
+
+/*conteudoP*/
+.container {
+  margin-left: 200px;
+  padding: 80px 30px 30px 30px;
+  width: calc(100% - 200px);
+}
+
+/* titulo e botao*/
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.top-bar h2 {
+  font-size: 20px;
+  color: #003b66;
+}
+
+.btn-novo {
+  background-color: #2196f3;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-novo:hover {
+  background-color: #1976d2;
+}
+
+/*cada card*/
+.card {
+  background-color: #e0f0ff;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card .info {
+  display: flex;
+  flex-direction: column;
+}
+
+.card .nome {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.card .tipo {
+  margin-top: 4px;
+  padding: 4px 10px;
+  border: 2px solid #003b66;
+  border-radius: 8px;
+  background-color: white;
+  color: #003b66;
+  font-weight: bold;
+  width: fit-content;
+}
+
+/*Ações*/
+.acoes {
+  display: flex;
+  gap: 10px;
+}
+
+.acoes img {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.acoes img:hover {
+  transform: scale(1.1);
+}
+
+</style>
+</head>
+<body>
+  <div class="sidebar">
+    <button>Agenda</button>
+    <button>Clientes</button>
+    <button>Serviços</button>
+    <button>Cadastro</button>
+    <button>Relatórios</button>
+    <button>Prontuários</button>
+    <button>Consultas</button>
+    <button>Vacinas</button>
+  </div>
+
+  <div class="header">
+    <img src="/LoginECadastro/logo.png" alt="Logo PetPlus" class="logo" />
+    <span>Bem-vindo, Fulano!</span>
+    <img src="icon-user.png" alt="Usuário" />
+    <img src="icon-settings.png" alt="Configurações" />
+    <img src="icon-logout.png" alt="Logout" />
+  </div>
+
+  <div class="container">
+    <div class="top-bar">
+      <h2>Cadastros</h2>
+      <button class="btn-novo">+ Novo Cadastro</button>
+    </div>
+
+    <div class="card">
+      <div>
+        <span class="nome">Cliente Fulano de Tal</span>
+        <span class="tipo">Cliente</span>
+      </div>
+      <div class="acoes">
+        <img src="icon-edit.png" alt="Editar">
+        <img src="icon-trash.png" alt="Excluir">
+      </div>
+    </div>
+
+    <div class="card">
+      <div>
+        <span class="nome">Secretário Fulano</span>
+        <span class="tipo">Secretária</span>
+      </div>
+      <div class="acoes">
+        <img src="icon-edit.png" alt="Editar">
+        <img src="icon-trash.png" alt="Excluir">
+      </div>
+    </div>
+
+    <div class="card">
+      <div>
+        <span class="nome">Pet Fulano</span>
+        <span class="tipo">Pet</span>
+      </div>
+      <div class="acoes">
+        <img src="icon-edit.png" alt="Editar">
+        <img src="icon-trash.png" alt="Excluir">
+      </div>
+    </div>
+
+    <div class="card">
+      <div>
+        <span class="nome">Veterinário Fulano</span>
+        <span class="tipo">Veterinário</span>
+      </div>
+      <div class="acoes">
+        <img src="icon-edit.png" alt="Editar">
+        <img src="icon-trash.png" alt="Excluir">
+      </div>
+    </div>
+  </div>
+</body>
+</html>
