@@ -1,0 +1,20 @@
+<?php
+header("Content-Type: application/json");
+include 'conexao.php';
+
+$dados = json_decode(file_get_contents("php://input"), true);
+
+$id = $dados['id'];
+$nomeTutor = $dados['nomeTutor'];
+$nomePet = $dados['nomePet'];
+$data = $dados['data'];
+$descricao = $dados['descricao'];
+
+$sql = "UPDATE atendimentos 
+        SET nome_tutor='$nomeTutor', nome_pet='$nomePet', data='$data', descricao='$descricao' 
+        WHERE id=$id";
+
+$conexao->query($sql);
+
+echo json_encode(["status" => "sucesso"]);
+?>
