@@ -1,9 +1,18 @@
+<?php
+session_start();
+
+// destrói a sessão e redireciona
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header('Location: /petplus/PetPlus-main/Tela_de_site/tela_site.html');
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <title>PetPlus - Tela Home</title>
-  <!-- Fonte Quicksand do Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body {
@@ -44,6 +53,7 @@
 
     .usuario img {
       height: 24px;
+      cursor: pointer;
     }
 
     .conteudo {
@@ -103,9 +113,11 @@
     </div>
     <div class="usuario">
       <img src="icones/usuario.png" alt="Usuário">
-      <span>Bem vindo!</span>
+      <span>Bem-vindo!</span>
       <img src="icones/config.png" alt="Configurações">
-      <img src="icones/sair.png" alt="Sair">
+      <a href="?logout=true">
+        <img src="icones/sair.png" alt="Sair">
+      </a>
     </div>
   </div>
 
@@ -115,25 +127,25 @@
       <a href="agenda.php" class="botao">
         <img src="icones/agenda.png" alt="Agenda"> Agenda
       </a>
-      <a href="clientes.php" class="botao">
+      <a href="..\pagina_inicial_sistema\pagina_inicial.html" class="botao">
         <img src="icones/clientes.png" alt="Clientes"> Clientes
       </a>
       <a href="servicos.php" class="botao">
         <img src="icones/servicos.png" alt="Serviços"> Serviços
       </a>
-      <a href="cadastro.php" class="botao">
+      <a href="..\cadastrar_pet\cadastrar_pets.html" class="botao">
         <img src="icones/cadastro.png" alt="Cadastro"> Cadastro
       </a>
-      <a href="relatorios.php" class="botao">
-        <img src="icones/relatorios.png" alt="Relatórios"> Relatórios
+      <a href="..\fatura_detalhada\fatura-detalhada.php" class="botao">
+        <img src="icones/relatorios.png" alt="Faturas"> Faturas
       </a>
-      <a href="prontuarios.php" class="botao">
+      <a href="..\diagnostico_consulta\diagnostico-consulta.php" class="botao">
         <img src="icones/prontuarios.png" alt="Prontuários"> Prontuários
       </a>
-      <a href="consultas.php" class="botao">
+      <a href="..\status_consulta\status-consulta.php" class="botao">
         <img src="icones/consultas.png" alt="Consultas"> Consultas
       </a>
-      <a href="vacinas.php" class="botao">
+      <a href="..\vacinas_e_controle_do_peso\vacinas-peso.html" class="botao">
         <img src="icones/vacinas.png" alt="Vacinas"> Vacinas
       </a>
     </div>
