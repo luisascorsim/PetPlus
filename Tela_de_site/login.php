@@ -1,25 +1,29 @@
 <?php
 include 'C:\xampp\htdocs\PetPlus\conecta_db.php';
-if (isset($_POST['email']) && isset($_POST['senha'])) {
-    $oMysql = conecta_db();
+$conn = conecta_db();
 
-    $email = $_POST['email'];
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
     $senha = $_POST['senha'];
 
-    $query = "SELECT nome, senha FROM Cliente WHERE email = '$email' AND senha = '$senha'";
-    $resultado = $oMysql->query($query);
+    $sql = "SELECT id_usuario, nome, senha FROM Usuarios WHERE email = '$email'";
+    $result = mysqli_query($conn, $sql);
 
-    if ($resultado && $resultado->num_rows == 1) {
-        // Login exitoso
-        session_start();
-        $_SESSION['cliente'] = $email;
-        header('Location: ../home/index.php');
-        exit();
-    } else {
-        echo "<script>alert('Email ou senha incorretos.');</script>";
+    if ($result && mysqli_num_rows($result) === 1) {
+        $usuario = mysqli_fetch_assoc($result);
+        if (password_verify($senha, $usuario['senha'])) {
+            session_start();
+            $_SESSION['id_usuario'] = $usuario['id_usuario'];
+            $_SESSION['nome'] = $usuario['nome'];
+            header('Location: /PetPlus/home/index.php');
+            exit();
+        }
     }
+    
+    echo "<script>alert('Login inválido'); window.history.back();</script>";
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -144,7 +148,7 @@ if (isset($_POST['email']) && isset($_POST['senha'])) {
       <img src="imagens\logo.png" alt="Logo PetPlus" />
     </div>
     <a href="tela_site.html" class="botao-voltar">
-      <img src="imagens\seta.png" alt="Voltar" class="icone-botao" />
+      <img src="seta.png" alt="Voltar" class="icone-botao" />
     </a>
     <h2>Entrar no PetPlus</h2>
 

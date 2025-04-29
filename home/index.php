@@ -1,18 +1,27 @@
 <?php
+// Inicia a sessão e verifica login
 session_start();
-
-// destrói a sessão e redireciona
-if (isset($_GET['logout'])) {
-    session_destroy();
-    header('Location: /petplus/PetPlus-main/Tela_de_site/tela_site.html');
+if (!isset($_SESSION['id_usuario'])) {
+    header('Location: /PetPlus/Tela_de_site/login.php');
     exit();
 }
+
+// Use caminho absoluto para o conecta_db.php
+include __DIR__ . '/../conecta_db.php';
+$conn = conecta_db();
+
+// Busca dados do usuário logado
+$usuario = mysqli_fetch_assoc(mysqli_query($conn, 
+    "SELECT nome, email FROM Usuarios WHERE id_usuario = {$_SESSION['id_usuario']}"
+));
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <title>PetPlus - Tela Home</title>
+  <!-- Fonte Quicksand do Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body {
@@ -53,7 +62,6 @@ if (isset($_GET['logout'])) {
 
     .usuario img {
       height: 24px;
-      cursor: pointer;
     }
 
     .conteudo {
@@ -102,6 +110,7 @@ if (isset($_GET['logout'])) {
       height: 30px;
       margin-right: 10px;
     }
+
   </style>
 </head>
 <body>
@@ -109,15 +118,13 @@ if (isset($_GET['logout'])) {
   <div class="topo">
     <div class="logo">
       <img src="imagens/logo.png" alt="PetPlus Logo">
-      <span>PetPlus</span>
+      <span></span>
     </div>
     <div class="usuario">
       <img src="icones/usuario.png" alt="Usuário">
-      <span>Bem-vindo!</span>
+      <span>Bem vindo!</span>
       <img src="icones/config.png" alt="Configurações">
-      <a href="?logout=true">
-        <img src="icones/sair.png" alt="Sair">
-      </a>
+      <img src="icones/sair.png" alt="Sair">
     </div>
   </div>
 
@@ -127,25 +134,25 @@ if (isset($_GET['logout'])) {
       <a href="agenda.php" class="botao">
         <img src="icones/agenda.png" alt="Agenda"> Agenda
       </a>
-      <a href="..\pagina_inicial_sistema\pagina_inicial.html" class="botao">
+      <a href="clientes.php" class="botao">
         <img src="icones/clientes.png" alt="Clientes"> Clientes
       </a>
       <a href="servicos.php" class="botao">
         <img src="icones/servicos.png" alt="Serviços"> Serviços
       </a>
-      <a href="..\cadastrar_pet\cadastrar_pets.html" class="botao">
+      <a href="cadastro.php" class="botao">
         <img src="icones/cadastro.png" alt="Cadastro"> Cadastro
       </a>
-      <a href="..\fatura_detalhada\fatura-detalhada.php" class="botao">
-        <img src="icones/relatorios.png" alt="Faturas"> Faturas
+      <a href="relatorios.php" class="botao">
+        <img src="icones/relatorios.png" alt="Relatórios"> Relatórios
       </a>
-      <a href="..\diagnostico_consulta\diagnostico-consulta.php" class="botao">
+      <a href="prontuarios.php" class="botao">
         <img src="icones/prontuarios.png" alt="Prontuários"> Prontuários
       </a>
-      <a href="..\status_consulta\status-consulta.php" class="botao">
+      <a href="consultas.php" class="botao">
         <img src="icones/consultas.png" alt="Consultas"> Consultas
       </a>
-      <a href="..\vacinas_e_controle_do_peso\vacinas-peso.html" class="botao">
+      <a href="vacinas.php" class="botao">
         <img src="icones/vacinas.png" alt="Vacinas"> Vacinas
       </a>
     </div>
