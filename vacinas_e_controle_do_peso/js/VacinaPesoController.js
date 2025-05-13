@@ -1,67 +1,74 @@
-class ControladorDiagnostico {
+class VacinaPesoController {
   constructor() {
-    this.apiUrl = "api/diagnosticos/";
-    this.carregarDiagnosticos();
-    document.getElementById("formDiagnostico").addEventListener("submit", (e) => {
-      e.preventDefault();
-      this.salvarDiagnostico();
-    });
+    this.apiUrlVacinas = "api/vacinas/"
+    this.apiUrlPeso = "api/peso/"
+
+    // Simular um pet selecionado para testes
+    this.simularPetSelecionado()
+
+    document.getElementById("controlePetForm").addEventListener("submit", (e) => {
+      e.preventDefault()
+      this.salvarDados()
+    })
   }
 
-  carregarDiagnosticos() {
-    fetch(this.apiUrl + "listarDiagnosticos.php")
-      .then(res => res.json())
-      .then(diagnosticos => this.renderizarTabela(diagnosticos))
-      .catch(err => console.error("Erro ao carregar diagnósticos:", err));
+  // Função para simular um pet selecionado (para testes)
+  simularPetSelecionado() {
+    // Criar um cookie ou localStorage para simular a sessão
+    localStorage.setItem("pet_id", "1")
+    localStorage.setItem("pet_nome", "Rex")
+
+    // Atualizar o nome do pet na interface
+    const nomePetElement = document.getElementById("nomePet")
+    if (nomePetElement) {
+      nomePetElement.value = localStorage.getItem("pet_nome") || "Pet"
+    }
   }
 
-  salvarDiagnostico() {
-    const sintomas = document.getElementById("sintomas").value;
-    const exames = document.getElementById("exames").value;
-    const prescricao = document.getElementById("prescricao").value;
-    const diagnostico = { sintomas: sintomas, exames: exames, prescricao: prescricao };
+  salvarDados() {
+    // Salvar peso
+    const peso = {
+      data: document.getElementById("dataPeso").value,
+      peso: document.getElementById("pesoPet").value,
+    }
 
-    fetch(this.apiUrl + "cadastrarDiagnostico.php", {
+    // Salvar vacina
+    const vacina = {
+      nome: document.getElementById("vacinaPet").value,
+      data: document.getElementById("dataVacina").value,
+      lote: "Lote-" + Math.floor(Math.random() * 10000), // Lote aleatório para teste
+      reforco: document.getElementById("proximaVacina").value,
+    }
+
+    // Simulação de salvamento
+    alert("Dados salvos com sucesso!")
+
+    // Comentado para evitar erros se a API não existir
+    /*
+    // Salvar peso
+    fetch(this.apiUrlPeso + "cadastrarPeso.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(diagnostico)
+      body: JSON.stringify(peso)
     })
       .then(res => res.json())
-      .then(msg => {
-        alert(msg.mensagem);
-        this.carregarDiagnosticos();
-        document.getElementById("formDiagnostico").reset();
-      })
-      .catch(err => console.error("Erro ao salvar diagnóstico:", err));
-  }
-
-  excluirDiagnostico(id) {
-    if (!confirm("Deseja realmente excluir este diagnóstico?")) return;
-    fetch(this.apiUrl + "excluirDiagnostico.php?id=" + id)
+      .then(data => console.log("Peso salvo:", data))
+      .catch(err => console.error("Erro ao salvar peso:", err))
+    
+    // Salvar vacina
+    fetch(this.apiUrlVacinas + "cadastrarVacina.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(vacina)
+    })
       .then(res => res.json())
-      .then(msg => {
-        alert(msg.mensagem);
-        this.carregarDiagnosticos();
-      })
-      .catch(err => console.error("Erro ao excluir diagnóstico:", err));
-  }
-
-  renderizarTabela(diagnosticos) {
-    const tbody = document.getElementById("listaDiagnosticos");
-    tbody.innerHTML = "";
-    diagnosticos.forEach((d) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${d.id}</td>
-        <td>${d.sintomas}</td>
-        <td>${d.exames}</td>
-        <td>${d.prescricao}</td>
-        <td>
-          <button class="btn-secondary" onclick="controlador.excluirDiagnostico(${d.id})">Excluir</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
+      .then(data => console.log("Vacina salva:", data))
+      .catch(err => console.error("Erro ao salvar vacina:", err))
+    */
   }
 }
-const controlador = new ControladorDiagnostico();
+
+// Inicializar o controlador quando o DOM estiver carregado
+document.addEventListener("DOMContentLoaded", () => {
+  const controlador = new VacinaPesoController()
+})

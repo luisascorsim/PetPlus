@@ -3,10 +3,11 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
-body, html {
+body,
+html {
   height: 100%;
 }
 
@@ -110,7 +111,8 @@ button:hover {
     font-size: 18px;
   }
 
-  input, button {
+  input,
+  button {
     font-size: 16px;
   }
 
@@ -139,7 +141,8 @@ button:hover {
     font-size: 16px;
   }
 
-  input, button {
+  input,
+  button {
     font-size: 14px;
   }
 
@@ -147,4 +150,3 @@ button:hover {
     font-size: 10px;
   }
 }
-

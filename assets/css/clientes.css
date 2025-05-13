@@ -1,0 +1,386 @@
+/* Estilos para a página de clientes */
+.clientes-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.clientes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.clientes-title {
+  font-size: 24px;
+  color: #333;
+}
+
+.btn-novo-cliente {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-novo-cliente:hover {
+  background-color: #45a049;
+}
+
+.search-container {
+  margin-bottom: 20px;
+  display: flex;
+}
+
+.search-input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 300px;
+  font-size: 14px;
+}
+
+.btn-search {
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  margin-left: -1px;
+}
+
+.btn-search:hover {
+  background-color: #0b7dda;
+}
+
+.clientes-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.clientes-table th,
+.clientes-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+.clientes-table th {
+  background-color: #f2f2f2;
+  color: #333;
+  font-weight: bold;
+}
+
+.clientes-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.clientes-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.btn-view,
+.btn-edit,
+.btn-delete {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btn-view {
+  background-color: #2196f3;
+  color: white;
+}
+
+.btn-edit {
+  background-color: #ffc107;
+  color: #333;
+}
+
+.btn-delete {
+  background-color: #f44336;
+  color: white;
+}
+
+.btn-view:hover {
+  background-color: #0b7dda;
+}
+
+.btn-edit:hover {
+  background-color: #e0a800;
+}
+
+.btn-delete:hover {
+  background-color: #da190b;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination a {
+  color: black;
+  float: left;
+  padding: 8px 16px;
+  text-decoration: none;
+  border: 1px solid #ddd;
+  margin: 0 4px;
+}
+
+.pagination a.active {
+  background-color: #4caf50;
+  color: white;
+  border: 1px solid #4caf50;
+}
+
+.pagination a:hover:not(.active) {
+  background-color: #ddd;
+}
+
+/* Modal de cliente */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 5% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 60%;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.close {
+  color: #aaa;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: black;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-row {
+  display: flex;
+  gap: 15px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.modal-footer {
+  margin-top: 20px;
+  text-align: right;
+  border-top: 1px solid #ddd;
+  padding-top: 15px;
+}
+
+.btn-cancel {
+  background-color: #ccc;
+  color: #333;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.btn-save {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-cancel:hover {
+  background-color: #bbb;
+}
+
+.btn-save:hover {
+  background-color: #45a049;
+}
+
+/* Detalhes do cliente */
+.cliente-details {
+  margin-top: 20px;
+}
+
+.cliente-info {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.cliente-info h3 {
+  margin-top: 0;
+  color: #333;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.info-row {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.info-label {
+  font-weight: bold;
+  width: 150px;
+}
+
+.info-value {
+  flex: 1;
+}
+
+.pets-list {
+  margin-top: 20px;
+}
+
+.pets-list h3 {
+  color: #333;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.pet-card {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 15px;
+  background-color: white;
+}
+
+.pet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.pet-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.pet-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.pet-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.pet-info-item {
+  flex: 1;
+  min-width: 200px;
+}
+
+.pet-info-label {
+  font-weight: bold;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.pet-info-value {
+  color: #333;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .clientes-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .search-container {
+    width: 100%;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .modal-content {
+    width: 90%;
+  }
+
+  .clientes-table {
+    display: block;
+    overflow-x: auto;
+  }
+}

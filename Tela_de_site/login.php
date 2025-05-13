@@ -1,21 +1,24 @@
 <?php
-include 'C:\xampp\htdocs\PetPlus\conecta_db.php';
+include '../conecta_db.php';
 $conn = conecta_db();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $senha = $_POST['senha'];
 
-    $sql = "SELECT id_usuario, nome, senha FROM Usuarios WHERE email = '$email'";
-    $result = mysqli_query($conn, $sql);
+    $sql = "SELECT id_usuario, nome, senha FROM Usuarios WHERE email = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-    if ($result && mysqli_num_rows($result) === 1) {
-        $usuario = mysqli_fetch_assoc($result);
+    if ($result && $result->num_rows === 1) {
+        $usuario = $result->fetch_assoc();
         if (password_verify($senha, $usuario['senha'])) {
             session_start();
             $_SESSION['id_usuario'] = $usuario['id_usuario'];
             $_SESSION['nome'] = $usuario['nome'];
-            header('Location: /PetPlus/home/index.php');
+            header('Location: ../home/index.php');
             exit();
         }
     }
@@ -25,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -145,7 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <div class="container mt-3"> 
   <div class="login-box">
     <div class="logo">
-      <img src="imagens\logo.png" alt="Logo PetPlus" />
+      <img src="logo.png" alt="Logo PetPlus" />
     </div>
     <a href="tela_site.html" class="botao-voltar">
       <img src="seta.png" alt="Voltar" class="icone-botao" />

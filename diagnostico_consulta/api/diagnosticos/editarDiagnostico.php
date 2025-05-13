@@ -31,4 +31,3 @@ if ($conn->query($sql)) {
 // Fecha a conexão com o banco de dados
 $conn->close();
 ?>
-

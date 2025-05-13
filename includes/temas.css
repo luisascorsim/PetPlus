@@ -1,0 +1,118 @@
+/* Temas */
+.tema-claro {
+  --cor-fundo: #f6f9fc;
+  --cor-texto: #333;
+  --cor-primaria: #2196f3;
+  --cor-secundaria: #0b3556;
+  --cor-borda: #ddd;
+  --cor-fundo-card: #fff;
+  --cor-fundo-header: #2196f3;
+  --cor-texto-header: #fff;
+}
+
+.tema-escuro {
+  --cor-fundo: #121212;
+  --cor-texto: #e0e0e0;
+  --cor-primaria: #90caf9;
+  --cor-secundaria: #64b5f6;
+  --cor-borda: #333;
+  --cor-fundo-card: #1e1e1e;
+  --cor-fundo-header: #1e1e1e;
+  --cor-texto-header: #e0e0e0;
+}
+
+.tema-azul {
+  --cor-fundo: #e3f2fd;
+  --cor-texto: #0d47a1;
+  --cor-primaria: #1976d2;
+  --cor-secundaria: #0d47a1;
+  --cor-borda: #bbdefb;
+  --cor-fundo-card: #fff;
+  --cor-fundo-header: #1976d2;
+  --cor-texto-header: #fff;
+}
+
+/* Aplicação das variáveis */
+body {
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto);
+}
+
+.header {
+  background-color: var(--cor-fundo-header) !important;
+  color: var(--cor-texto-header) !important;
+}
+
+.container,
+.conteudo {
+  background-color: var(--cor-fundo-card) !important;
+  border-color: var(--cor-borda) !important;
+}
+
+button,
+.btn-primary,
+.botao {
+  background-color: var(--cor-primaria) !important;
+  color: #fff !important;
+}
+
+button:hover,
+.btn-primary:hover,
+.botao:hover {
+  background-color: var(--cor-secundaria) !important;
+}
+
+/* Tamanhos de fonte */
+.fonte-pequena {
+  font-size: 14px;
+}
+
+.fonte-media {
+  font-size: 16px;
+}
+
+.fonte-grande {
+  font-size: 18px;
+}
+
+.fonte-pequena h1 {
+  font-size: 24px;
+}
+
+.fonte-media h1 {
+  font-size: 28px;
+}
+
+.fonte-grande h1 {
+  font-size: 32px;
+}
+
+.fonte-pequena h2 {
+  font-size: 20px;
+}
+
+.fonte-media h2 {
+  font-size: 22px;
+}
+
+.fonte-grande h2 {
+  font-size: 26px;
+}
+
+/* Ajustes para o header */
+.header {
+  transition: background-color 0.3s ease;
+}
+
+.dropdown-content {
+  background-color: var(--cor-fundo-card);
+  border: 1px solid var(--cor-borda);
+}
+
+.dropdown-content a {
+  color: var(--cor-texto) !important;
+}
+
+.dropdown-content a:hover {
+  background-color: var(--cor-fundo);
+}

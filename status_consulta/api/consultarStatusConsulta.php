@@ -12,7 +12,7 @@ if (!isset($dadosRecebidos['consulta_id'])) {
 
 $host = "localhost";
 $usuario = "root";
-$senha = "";
+$senha = "PUC@1234";
 $banco = "petplus";
 
 $conn = mysqli_connect($host, $usuario, $senha, $banco);

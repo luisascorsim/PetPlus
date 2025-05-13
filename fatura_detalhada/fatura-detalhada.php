@@ -1,119 +1,50 @@
+<?php
+// Inicia a sessão apenas se ainda não estiver ativa
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+$current_page = 'fatura';
+$page_title = 'Fatura Detalhada';
+include_once('../includes/header.php');
+
+// Verificar se o usuário está logado
+if (!isset($_SESSION['id_usuario']) && !isset($_SESSION['usuario_id'])) {
+    // Para desenvolvimento, criar uma sessão temporária
+    $_SESSION['usuario_id'] = 1;
+    $_SESSION['usuario_nome'] = 'Administrador';
+    $_SESSION['usuario_email'] = 'admin@petplus.com';
+    $_SESSION['usuario_tipo'] = 'admin';
+}
+
+// Inclui o arquivo de conexão
+require_once('../conecta_db.php');
+$conn = conecta_db();
+?>
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Fatura Detalhada</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f6f9fc;
-      margin: 0;
-      padding: 20px;
-    }
-
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      background: #fff;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
-    }
-
-    h1 {
-      text-align: center;
-      color: #333;
-    }
-
-    .grupo-formulario {
-      margin-bottom: 20px;
-    }
-
-    .grupo-formulario label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-
-    .grupo-formulario input,
-    .grupo-formulario select,
-    .grupo-formulario textarea {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-
-    .botoes-formulario {
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    button {
-      padding: 10px 20px;
-      margin: 5px;
-      border: none;
-      border-radius: 6px;
-      background-color: #4caf50;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #45a049;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 40px;
-    }
-
-    table th,
-    table td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: center;
-    }
-
-    table th {
-      background-color: #f2f2f2;
-    }
-
-    /* Responsividade */
-    @media (max-width: 768px) {
-      .container {
-        padding: 15px;
-      }
-
-      h1 {
-        font-size: 1.5em;
-      }
-
-      .grupo-formulario input,
-      .grupo-formulario select,
-      .grupo-formulario textarea {
-        font-size: 14px;
-        padding: 8px;
-      }
-
-      table th, table td {
-        padding: 8px;
-      }
-
-      button {
-        width: 100%;
-        font-size: 14px;
-        padding: 12px 20px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fatura Detalhada - PetPlus</title>
+    <link rel="stylesheet" href="../includes/global.css">
+    <style>
+        /* Estilos específicos da página */
+        .container {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        @media (max-width: 768px) {
+            .container {
+                margin-left: 0;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Fatura Detalhada</h1>
+    <?php include_once('../includes/sidebar.php'); ?>
+    <div class="container">
+        <h1>Fatura Detalhada</h1>
 
     <!-- Formulário da Fatura -->
     <form id="formularioFatura">
@@ -189,8 +120,7 @@
       </thead>
       <tbody id="listaFaturas"></tbody>
     </table>
-  </div>
-
-  <script src="js/ControladorFatura.js"></script>
+    </div>
+    <script src="../includes/header.js"></script>
 </body>
 </html>

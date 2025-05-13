@@ -1,0 +1,236 @@
+/* Estilos globais para o sistema PetPlus */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Quicksand", sans-serif;
+}
+
+body {
+  background-color: #f6f9fc;
+  padding-top: 60px; /* Espaço para o header fixo */
+}
+
+.container {
+  margin-left: 220px;
+  padding: 20px;
+  transition: margin-left 0.3s;
+}
+
+.card {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 900px;
+  margin: 0 auto 30px;
+}
+
+h1,
+h2,
+h3 {
+  color: #003b66;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: bold;
+  color: #003b66;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.btn-primary {
+  background-color: #003b66;
+  color: white;
+  padding: 12px;
+  border: none;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  font-weight: bold;
+}
+
+.btn-primary:hover {
+  background-color: #002b4d;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+  padding: 12px;
+  border: none;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  color: #212529;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800;
+}
+
+.mensagem {
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.mensagem-sucesso {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.mensagem-erro {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+table th,
+table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+table th {
+  background-color: #f2f2f2;
+  color: #003b66;
+}
+
+.btn-action {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 5px;
+  font-size: 14px;
+}
+
+.btn-edit {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.btn-edit:hover {
+  background-color: #e0a800;
+}
+
+.btn-delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: #c82333;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .container {
+    margin-left: 60px;
+    padding: 15px;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  table th,
+  table td {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .btn-action {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    margin-left: 0;
+    padding: 10px;
+  }
+
+  .card {
+    padding: 15px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    font-size: 14px;
+    padding: 10px;
+  }
+}

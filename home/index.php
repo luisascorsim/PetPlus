@@ -2,161 +2,143 @@
 // Inicia a sessão e verifica login
 session_start();
 if (!isset($_SESSION['id_usuario'])) {
-    header('Location: /PetPlus/Tela_de_site/login.php');
+    header('Location: ../Tela_de_site/login.php');
     exit();
 }
 
-// Use caminho absoluto para o conecta_db.php
-include __DIR__ . '/../conecta_db.php';
+// Inclui o header
+require_once('../includes/header.php');
+require_once('../includes/sidebar.php');
+
+// Use caminho relativo para o conecta_db.php
+require_once('../conecta_db.php');
 $conn = conecta_db();
 
 // Busca dados do usuário logado
-$usuario = mysqli_fetch_assoc(mysqli_query($conn, 
-    "SELECT nome, email FROM Usuarios WHERE id_usuario = {$_SESSION['id_usuario']}"
-));
+$query = "SELECT nome, email FROM Usuarios WHERE id_usuario = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("i", $_SESSION['id_usuario']);
+$stmt->execute();
+$result = $stmt->get_result();
+$usuario = $result->fetch_assoc();
+
+if (!$usuario) {
+    $usuario = ['nome' => 'Usuário', 'email' => ''];
+}
 ?>
 
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <title>PetPlus - Tela Home</title>
-  <!-- Fonte Quicksand do Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Quicksand', sans-serif;
-      background-color: #d3d3d3;
-    }
-
-    .topo {
-      background-color: #2196f3;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 30px;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-    }
-
-    .logo img {
-      height: 40px;
-      margin-right: 10px;
-    }
-
-    .logo span {
-      font-size: 20px;
-      font-weight: 700;
-    }
-
-    .usuario {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .usuario img {
-      height: 24px;
-    }
-
-    .conteudo {
-      background-color: white;
-      width: 700px;
-      margin: 50px auto;
-      padding: 30px;
-      border-radius: 10px;
-      text-align: center;
-    }
-
-    .conteudo h1 {
-      margin-bottom: 40px;
-      color: #0b3556;
-      font-size: 28px;
-      font-weight: 600;
-    }
-
-    .botoes {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px 40px;
-      justify-items: center;
-    }
-
-    .botao {
-      display: flex;
-      align-items: center;
-      background-color: #0b3556;
-      color: white;
-      text-decoration: none;
-      padding: 10px 20px;
-      border-radius: 6px;
-      font-size: 18px;
-      font-weight: 500;
-      transition: background-color 0.3s;
-      width: 220px;
-      justify-content: left;
-    }
-
-    .botao:hover {
-      background-color: #0d4371;
-    }
-
-    .botao img {
-      height: 30px;
-      margin-right: 10px;
-    }
-
-  </style>
-</head>
-<body>
-
-  <div class="topo">
-    <div class="logo">
-      <img src="imagens/logo.png" alt="PetPlus Logo">
-      <span></span>
-    </div>
-    <div class="usuario">
-      <img src="icones/usuario.png" alt="Usuário">
-      <span>Bem vindo!</span>
-      <img src="icones/config.png" alt="Configurações">
-      <img src="icones/sair.png" alt="Sair">
-    </div>
-  </div>
-
-  <div class="conteudo">
+<div class="container">
+  <div class="card">
     <h1>PetPlus</h1>
     <div class="botoes">
-      <a href="agenda.php" class="botao">
-        <img src="icones/agenda.png" alt="Agenda"> Agenda
+      <a href="../agenda/agenda.php" class="botao">
+        <i class="fas fa-calendar-alt"></i>
+        Agenda
       </a>
-      <a href="clientes.php" class="botao">
-        <img src="icones/clientes.png" alt="Clientes"> Clientes
+      <a href="../clientes/clientes.php" class="botao">
+        <i class="fas fa-users"></i>
+        Clientes
       </a>
-      <a href="servicos.php" class="botao">
-        <img src="icones/servicos.png" alt="Serviços"> Serviços
+      <a href="../servicos/servicos.php" class="botao">
+        <i class="fas fa-concierge-bell"></i>
+        Serviços
       </a>
-      <a href="cadastro.php" class="botao">
-        <img src="icones/cadastro.png" alt="Cadastro"> Cadastro
+      <a href="../cadastrar_pet/cadastrar_pets.php" class="botao">
+        <i class="fas fa-paw"></i>
+        Cadastro
       </a>
-      <a href="relatorios.php" class="botao">
-        <img src="icones/relatorios.png" alt="Relatórios"> Relatórios
+      <a href="../relatorio_atendimentos/relatorio-atendimentos.php" class="botao">
+        <i class="fas fa-chart-bar"></i>
+        Relatórios
       </a>
-      <a href="prontuarios.php" class="botao">
-        <img src="icones/prontuarios.png" alt="Prontuários"> Prontuários
+      <a href="../diagnostico_consulta/diagnostico-consulta.php" class="botao">
+        <i class="fas fa-stethoscope"></i>
+        Prontuários
       </a>
-      <a href="consultas.php" class="botao">
-        <img src="icones/consultas.png" alt="Consultas"> Consultas
+      <a href="../historico_consultas/historico-consultas.php" class="botao">
+        <i class="fas fa-clipboard-list"></i>
+        Consultas
       </a>
-      <a href="vacinas.php" class="botao">
-        <img src="icones/vacinas.png" alt="Vacinas"> Vacinas
+      <a href="../vacinas_e_controle_do_peso/vacinas-peso.php" class="botao">
+        <i class="fas fa-syringe"></i>
+        Vacinas
       </a>
     </div>
   </div>
+</div>
+
+<style>
+  .container {
+    margin-left: 220px;
+    padding: 80px 30px 30px;
+    transition: margin-left 0.3s;
+  }
+  
+  .card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    padding: 30px;
+    margin-bottom: 20px;
+  }
+  
+  h1 {
+    color: #0b3556;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+
+  .botoes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    justify-items: center;
+  }
+
+  .botao {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0b3556;
+    color: white;
+    text-decoration: none;
+    padding: 20px;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 500;
+    transition: all 0.3s;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+
+  .botao i {
+    margin-right: 10px;
+    font-size: 24px;
+  }
+
+  .botao:hover {
+    background-color: #0d4371;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+  }
+  
+  /* Responsividade */
+  @media (max-width: 768px) {
+    .container {
+      margin-left: 60px;
+      padding: 70px 15px 15px;
+    }
+    
+    .botoes {
+      grid-template-columns: 1fr;
+    }
+    
+    .botao {
+      width: 100%;
+    }
+  }
+</style>
 
 </body>
 </html>

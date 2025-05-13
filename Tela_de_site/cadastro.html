@@ -11,7 +11,7 @@
 <div class="fundo">
     <div class="card">
         <!-- Logo da empresa -->
-        <img src="logo.png" alt="Logo PetPlus" class="logo" />
+        <img src="logo.png" alt="PetPlus" class="logo" />
         
         <!-- Título de cabeçalho -->
         <h2>Crie a sua conta</h2>
@@ -31,7 +31,7 @@
             <input type="email" id="email" name="email" required><br><br>
 
             <label for="senha">Senha</label>
-            <input type="password" id="senha" name="senha" required><br><br>
+            <input type="password" id="senha" name="senha" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Deve conter ao menos um numero, uma letra maiúscula, uma letra minuscula, um simbolo especial e 8 ou mais caracteres." required><br><br>
 
             
 

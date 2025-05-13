@@ -12,23 +12,20 @@ if (!isset($dados['id'])) {
 // Inclui o arquivo de conexão com o banco de dados
 include '../conexao.php';
 
-// Monta a query SQL para atualizar os dados da consulta
-$sql = "UPDATE consultas 
-        SET data = '" . $conn->real_escape_string($dados['data']) . "', 
-            descricao = '" . $conn->real_escape_string($dados['descricao']) . "', 
-            status = '" . $conn->real_escape_string($dados['status']) . "' 
-        WHERE id = " . (int)$dados['id'];
+// Prepara a consulta SQL para atualizar os dados da consulta
+$stmt = $conn->prepare("UPDATE consultas SET data = ?, descricao = ?, status = ? WHERE id = ?");
+$stmt->bind_param("sssi", $dados['data'], $dados['descricao'], $dados['status'], $dados['id']);
 
 // Executa a query
-if ($conn->query($sql)) {
+if ($stmt->execute()) {
   // Retorna uma mensagem de sucesso em JSON caso a atualização seja bem-sucedida
   echo json_encode(["mensagem" => "Consulta atualizada com sucesso!"]);
 } else {
   // Retorna uma mensagem de erro em JSON caso falhe ao atualizar a consulta
-  echo json_encode(["mensagem" => "Erro ao atualizar consulta."]);
+  echo json_encode(["mensagem" => "Erro ao atualizar consulta: " . $stmt->error]);
 }
 
 // Fecha a conexão com o banco de dados
+$stmt->close();
 $conn->close();
 ?>
-

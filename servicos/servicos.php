@@ -1,0 +1,611 @@
+<?php
+// Inicia a sessão e verifica login
+session_start();
+if (!isset($_SESSION['id_usuario'])) {
+    header('Location: ../Tela_de_site/login.php');
+    exit();
+}
+
+// Define o caminho base para os recursos
+$caminhoBase = '../';
+
+// Inclui o header e sidebar
+require_once('../includes/header.php');
+require_once('../includes/sidebar.php');
+
+// Conexão com o banco de dados
+require_once('../conecta_db.php');
+$conn = conecta_db();
+
+// Simulação de dados de serviços (em um sistema real, viria do banco de dados)
+$servicos = [
+    [
+        'id' => 1,
+        'nome' => 'Consulta de Rotina',
+        'descricao' => 'Avaliação geral da saúde do animal, incluindo exame físico completo.',
+        'duracao' => 30,
+        'preco' => 120.00,
+        'categoria' => 'Consulta'
+    ],
+    [
+        'id' => 2,
+        'nome' => 'Vacinação',
+        'descricao' => 'Aplicação de vacinas de acordo com o calendário vacinal do animal.',
+        'duracao' => 15,
+        'preco' => 80.00,
+        'categoria' => 'Prevenção'
+    ],
+    [
+        'id' => 3,
+        'nome' => 'Banho e Tosa',
+        'descricao' => 'Higienização completa do animal, incluindo banho, secagem, escovação e corte de pelos.',
+        'duracao' => 90,
+        'preco' => 70.00,
+        'categoria' => 'Estética'
+    ],
+    [
+        'id' => 4,
+        'nome' => 'Exames Laboratoriais',
+        'descricao' => 'Coleta e análise de amostras para diagnóstico de doenças e avaliação da saúde.',
+        'duracao' => 20,
+        'preco' => 150.00,
+        'categoria' => 'Diagnóstico'
+    ],
+    [
+        'id' => 5,
+        'nome' => 'Cirurgia de Castração',
+        'descricao' => 'Procedimento cirúrgico para esterilização do animal.',
+        'duracao' => 60,
+        'preco' => 350.00,
+        'categoria' => 'Cirurgia'
+    ],
+    [
+        'id' => 6,
+        'nome' => 'Tratamento Dentário',
+        'descricao' => 'Limpeza, remoção de tártaro e tratamento de problemas dentários.',
+        'duracao' => 45,
+        'preco' => 200.00,
+        'categoria' => 'Odontologia'
+    ]
+];
+
+// Filtragem de serviços por categoria
+$categorias = array_unique(array_column($servicos, 'categoria'));
+$categoriaFiltro = isset($_GET['categoria']) ? $_GET['categoria'] : '';
+
+if (!empty($categoriaFiltro)) {
+    $servicos = array_filter($servicos, function($servico) use ($categoriaFiltro) {
+        return $servico['categoria'] === $categoriaFiltro;
+    });
+}
+
+// Busca por nome
+$termoBusca = isset($_GET['busca']) ? $_GET['busca'] : '';
+if (!empty($termoBusca)) {
+    $servicos = array_filter($servicos, function($servico) use ($termoBusca) {
+        return (
+            stripos($servico['nome'], $termoBusca) !== false ||
+            stripos($servico['descricao'], $termoBusca) !== false
+        );
+    });
+}
+?>
+
+<div class="container">
+    <div class="card">
+        <div class="header-card">
+            <h1>Serviços</h1>
+            <button class="btn-novo" onclick="abrirModalServico()">Novo Serviço</button>
+        </div>
+        
+        <div class="filtro-container">
+            <div class="categorias-filtro">
+                <a href="servicos.php" class="categoria-item <?php echo empty($categoriaFiltro) ? 'ativo' : ''; ?>">Todos</a>
+                <?php foreach ($categorias as $categoria): ?>
+                    <a href="?categoria=<?php echo urlencode($categoria); ?>" class="categoria-item <?php echo $categoriaFiltro === $categoria ? 'ativo' : ''; ?>">
+                        <?php echo htmlspecialchars($categoria); ?>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+            
+            <form action="" method="GET" class="form-busca">
+                <?php if (!empty($categoriaFiltro)): ?>
+                    <input type="hidden" name="categoria" value="<?php echo htmlspecialchars($categoriaFiltro); ?>">
+                <?php endif; ?>
+                <input type="text" name="busca" placeholder="Buscar serviços..." value="<?php echo htmlspecialchars($termoBusca); ?>">
+                <button type="submit" class="btn-buscar">Buscar</button>
+                <?php if (!empty($termoBusca)): ?>
+                    <a href="<?php echo empty($categoriaFiltro) ? 'servicos.php' : '?categoria=' . urlencode($categoriaFiltro); ?>" class="btn-limpar">Limpar</a>
+                <?php endif; ?>
+            </form>
+        </div>
+        
+        <div class="servicos-grid">
+            <?php if (empty($servicos)): ?>
+                <div class="mensagem-vazia">
+                    <p>Nenhum serviço encontrado.</p>
+                </div>
+            <?php else: ?>
+                <?php foreach ($servicos as $servico): ?>
+                    <div class="servico-card">
+                        <div class="servico-categoria"><?php echo htmlspecialchars($servico['categoria']); ?></div>
+                        <h3><?php echo htmlspecialchars($servico['nome']); ?></h3>
+                        <p class="servico-descricao"><?php echo htmlspecialchars($servico['descricao']); ?></p>
+                        <div class="servico-detalhes">
+                            <span><strong>Duração:</strong> <?php echo $servico['duracao']; ?> min</span>
+                            <span><strong>Preço:</strong> R$ <?php echo number_format($servico['preco'], 2, ',', '.'); ?></span>
+                        </div>
+                        <div class="servico-acoes">
+                            <button class="btn-editar" onclick="abrirModalServico(<?php echo $servico['id']; ?>)">Editar</button>
+                            <button class="btn-excluir" onclick="confirmarExclusao(<?php echo $servico['id']; ?>)">Excluir</button>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Serviço -->
+<div id="modalServico" class="modal">
+    <div class="modal-content">
+        <span class="fechar" onclick="fecharModalServico()">&times;</span>
+        <h2 id="tituloModal">Novo Serviço</h2>
+        <form id="formServico">
+            <input type="hidden" id="servico_id" name="servico_id" value="">
+            
+            <div class="form-group">
+                <label for="nome">Nome do Serviço:</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="categoria">Categoria:</label>
+                <select id="categoria" name="categoria" required>
+                    <option value="">Selecione</option>
+                    <?php foreach ($categorias as $categoria): ?>
+                        <option value="<?php echo htmlspecialchars($categoria); ?>"><?php echo htmlspecialchars($categoria); ?></option>
+                    <?php endforeach; ?>
+                    <option value="nova">Nova Categoria...</option>
+                </select>
+            </div>
+            
+            <div id="novaCategoriaGroup" class="form-group" style="display: none;">
+                <label for="novaCategoria">Nova Categoria:</label>
+                <input type="text" id="novaCategoria" name="novaCategoria">
+            </div>
+            
+            <div class="form-group">
+                <label for="descricao">Descrição:</label>
+                <textarea id="descricao" name="descricao" rows="3" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="duracao">Duração (minutos):</label>
+                <input type="number" id="duracao" name="duracao" min="1" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="preco">Preço (R$):</label>
+                <input type="number" id="preco" name="preco" min="0" step="0.01" required>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn-cancelar" onclick="fecharModalServico()">Cancelar</button>
+                <button type="submit" class="btn-salvar">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div id="modalConfirmacao" class="modal">
+    <div class="modal-content modal-confirmacao">
+        <h2>Confirmar Exclusão</h2>
+        <p>Tem certeza que deseja excluir este serviço?</p>
+        <div class="form-actions">
+            <button type="button" class="btn-cancelar" onclick="fecharModalConfirmacao()">Cancelar</button>
+            <button type="button" class="btn-excluir-confirmar" onclick="excluirServico()">Excluir</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .container {
+        margin-left: 220px;
+        padding: 80px 30px 30px;
+        transition: margin-left 0.3s;
+    }
+    
+    .card {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .header-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    h1 {
+        color: #0b3556;
+        margin: 0;
+    }
+    
+    .btn-novo {
+        background-color: #0b3556;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 15px;
+        cursor: pointer;
+        font-weight: 500;
+    }
+    
+    .btn-novo:hover {
+        background-color: #0d4371;
+    }
+    
+    .filtro-container {
+        margin-bottom: 20px;
+    }
+    
+    .categorias-filtro {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .categoria-item {
+        padding: 8px 12px;
+        background-color: #f0f0f0;
+        color: #333;
+        border-radius: 20px;
+        text-decoration: none;
+        font-size: 14px;
+        transition: background-color 0.2s;
+    }
+    
+    .categoria-item:hover {
+        background-color: #e0e0e0;
+    }
+    
+    .categoria-item.ativo {
+        background-color: #0b3556;
+        color: white;
+    }
+    
+    .form-busca {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .form-busca input {
+        flex: 1;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    .btn-buscar {
+        background-color: #0b3556;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 15px;
+        cursor: pointer;
+    }
+    
+    .btn-limpar {
+        background-color: #f0f0f0;
+        color: #333;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 15px;
+        text-decoration: none;
+    }
+    
+    .servicos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    
+    .servico-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        position: relative;
+        background-color: #f9f9f9;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .servico-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .servico-categoria {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #0b3556;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+    }
+    
+    .servico-card h3 {
+        margin: 0 0 10px 0;
+        color: #0b3556;
+        padding-right: 80px;
+    }
+    
+    .servico-descricao {
+        margin: 0 0 15px 0;
+        color: #555;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+    
+    .servico-detalhes {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        font-size: 14px;
+    }
+    
+    .servico-acoes {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .btn-editar, .btn-excluir {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        flex: 1;
+        text-align: center;
+    }
+    
+    .btn-editar {
+        background-color: #0b3556;
+        color: white;
+    }
+    
+    .btn-excluir {
+        background-color: #f44336;
+        color: white;
+    }
+    
+    .mensagem-vazia {
+        padding: 20px;
+        text-align: center;
+        color: #666;
+        grid-column: 1 / -1;
+    }
+    
+    /* Modal */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+    
+    .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+        border-radius: 8px;
+        position: relative;
+    }
+    
+    .modal-confirmacao {
+        max-width: 400px;
+        text-align: center;
+    }
+    
+    .fechar {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    
+    .fechar:hover {
+        color: black;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    
+    .btn-cancelar {
+        background-color: #f0f0f0;
+        color: #333;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 15px;
+        cursor: pointer;
+    }
+    
+    .btn-salvar {
+        background-color: #0b3556;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 15px;
+        cursor: pointer;
+    }
+    
+    .btn-excluir-confirmar {
+        background-color: #f44336;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 15px;
+        cursor: pointer;
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .container {
+            margin-left: 60px;
+            padding: 70px 15px 15px;
+        }
+        
+        .servicos-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .modal-content {
+            width: 95%;
+            margin: 10% auto;
+        }
+    }
+</style>
+
+<script>
+    // Variável para armazenar o ID do serviço a ser excluído
+    let servicoParaExcluir = null;
+    
+    // Função para abrir o modal de serviço
+    function abrirModalServico(servicoId = null) {
+        const modal = document.getElementById('modalServico');
+        const tituloModal = document.getElementById('tituloModal');
+        const form = document.getElementById('formServico');
+        
+        modal.style.display = 'block';
+        
+        if (servicoId) {
+            tituloModal.textContent = 'Editar Serviço';
+            document.getElementById('servico_id').value = servicoId;
+            
+            // Simulação de preenchimento do formulário com dados do serviço
+            // Em um sistema real, você buscaria os dados do serviço no banco de dados
+            const servico = <?php echo json_encode($servicos); ?>.find(s => s.id === servicoId);
+            
+            if (servico) {
+                document.getElementById('nome').value = servico.nome;
+                document.getElementById('categoria').value = servico.categoria;
+                document.getElementById('descricao').value = servico.descricao;
+                document.getElementById('duracao').value = servico.duracao;
+                document.getElementById('preco').value = servico.preco;
+            }
+        } else {
+            tituloModal.textContent = 'Novo Serviço';
+            form.reset();
+        }
+    }
+    
+    // Função para fechar o modal de serviço
+    function fecharModalServico() {
+        const modal = document.getElementById('modalServico');
+        modal.style.display = 'none';
+    }
+    
+    // Função para abrir o modal de confirmação de exclusão
+    function confirmarExclusao(servicoId) {
+        servicoParaExcluir = servicoId;
+        const modal = document.getElementById('modalConfirmacao');
+        modal.style.display = 'block';
+    }
+    
+    // Função para fechar o modal de confirmação
+    function fecharModalConfirmacao() {
+        const modal = document.getElementById('modalConfirmacao');
+        modal.style.display = 'none';
+        servicoParaExcluir = null;
+    }
+    
+    // Função para excluir o serviço
+    function excluirServico() {
+        if (servicoParaExcluir) {
+            // Aqui você implementaria a lógica para excluir o serviço
+            alert('Serviço excluído com sucesso!');
+            fecharModalConfirmacao();
+            
+            // Em um sistema real, você recarregaria a página ou atualizaria a visualização
+            // window.location.reload();
+        }
+    }
+    
+    // Mostrar campo de nova categoria quando "Nova Categoria" for selecionada
+    document.getElementById('categoria').addEventListener('change', function() {
+        const novaCategoriaGroup = document.getElementById('novaCategoriaGroup');
+        if (this.value === 'nova') {
+            novaCategoriaGroup.style.display = 'block';
+        } else {
+            novaCategoriaGroup.style.display = 'none';
+        }
+    });
+    
+    // Manipula o envio do formulário
+    document.getElementById('formServico').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Aqui você implementaria a lógica para salvar o serviço
+        alert('Serviço salvo com sucesso!');
+        fecharModalServico();
+        
+        // Em um sistema real, você recarregaria a página ou atualizaria a visualização
+        // window.location.reload();
+    });
+    
+    // Fecha os modais se o usuário clicar fora deles
+    window.addEventListener('click', function(event) {
+        const modalServico = document.getElementById('modalServico');
+        const modalConfirmacao = document.getElementById('modalConfirmacao');
+        
+        if (event.target == modalServico) {
+            fecharModalServico();
+        }
+        
+        if (event.target == modalConfirmacao) {
+            fecharModalConfirmacao();
+        }
+    });
+</script>
+
+</body>
+</html>
