@@ -2,6 +2,7 @@ class ControleDeAtendimentos {
   constructor() {
     this.apiUrl = "api/"
     this.carregarAtendimentos()
+    this.carregarDadosGraficos() // Nova linha
 
     document.getElementById("formAtendimento").addEventListener("submit", (e) => {
       e.preventDefault()
@@ -115,6 +116,20 @@ class ControleDeAtendimentos {
   limparFormulario() {
     document.getElementById("formAtendimento").reset()
     document.getElementById("idAtendimento").value = ""
+  }
+
+  carregarDadosGraficos() {
+
+    // Exemplo de como seria a implementação:
+    /*
+    fetch(this.apiUrl + "estatisticas.php")
+        .then(response => response.json())
+        .then(data => {
+            // Atualizar os gráficos com os dados recebidos
+            atualizarGraficos(data);
+        })
+        .catch(error => console.error("Erro ao carregar estatísticas:", error));
+    */
   }
 }
 

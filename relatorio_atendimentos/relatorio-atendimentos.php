@@ -51,13 +51,17 @@ $faturamento_por_servico = [
 ];
 ?>
 
-<div class="container">
+<div class="container" id="relatorio-container">
     <div class="card">
         <div class="header-card">
             <h1>Relatório de Atendimentos</h1>
             <div class="acoes-relatorio">
-                <button class="btn-exportar" onclick="exportarPDF()">Exportar PDF</button>
-                <button class="btn-exportar" onclick="exportarExcel()">Exportar Excel</button>
+                <button class="btn-exportar" onclick="exportarPDF()">
+                    <i class="fas fa-file-pdf"></i> Exportar PDF
+                </button>
+                <button class="btn-exportar" onclick="exportarExcel()">
+                    <i class="fas fa-file-excel"></i> Exportar Excel
+                </button>
             </div>
         </div>
         
@@ -129,31 +133,22 @@ $faturamento_por_servico = [
         <div class="graficos-container">
             <div class="grafico-card">
                 <h3>Consultas por Dia</h3>
-                <div class="grafico" id="grafico-consultas">
-                    <!-- Gráfico será renderizado via JavaScript -->
-                    <div class="grafico-placeholder">
-                        <p>Gráfico de consultas por dia será exibido aqui</p>
-                    </div>
+                <div class="grafico">
+                    <canvas id="grafico-consultas"></canvas>
                 </div>
             </div>
             
             <div class="grafico-card">
                 <h3>Serviços Mais Populares</h3>
-                <div class="grafico" id="grafico-servicos">
-                    <!-- Gráfico será renderizado via JavaScript -->
-                    <div class="grafico-placeholder">
-                        <p>Gráfico de serviços populares será exibido aqui</p>
-                    </div>
+                <div class="grafico">
+                    <canvas id="grafico-servicos"></canvas>
                 </div>
             </div>
             
             <div class="grafico-card">
                 <h3>Faturamento por Serviço</h3>
-                <div class="grafico" id="grafico-faturamento">
-                    <!-- Gráfico será renderizado via JavaScript -->
-                    <div class="grafico-placeholder">
-                        <p>Gráfico de faturamento por serviço será exibido aqui</p>
-                    </div>
+                <div class="grafico">
+                    <canvas id="grafico-faturamento"></canvas>
                 </div>
             </div>
         </div>
@@ -251,6 +246,14 @@ $faturamento_por_servico = [
         border-radius: 4px;
         padding: 8px 15px;
         cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: background-color 0.3s;
+    }
+    
+    .btn-exportar:hover {
+        background-color: #0d4371;
     }
     
     .filtro-container {
@@ -294,6 +297,11 @@ $faturamento_por_servico = [
         padding: 8px 15px;
         cursor: pointer;
         height: 36px;
+        transition: background-color 0.3s;
+    }
+    
+    .btn-filtrar:hover {
+        background-color: #0d4371;
     }
     
     .resumo-container {
@@ -310,6 +318,12 @@ $faturamento_por_servico = [
         background-color: #f9f9f9;
         border-radius: 5px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .card-resumo:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     
     .resumo-icon {
@@ -350,6 +364,12 @@ $faturamento_por_servico = [
         background-color: #f9f9f9;
         border-radius: 5px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .grafico-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     
     .grafico-card h3 {
@@ -363,6 +383,13 @@ $faturamento_por_servico = [
         background-color: #fff;
         border-radius: 5px;
         overflow: hidden;
+        padding: 10px;
+        box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+    }
+
+    .grafico canvas {
+        width: 100% !important;
+        height: 100% !important;
     }
     
     .grafico-placeholder {
@@ -418,6 +445,10 @@ $faturamento_por_servico = [
         .graficos-container {
             grid-template-columns: 1fr;
         }
+
+        .grafico {
+            height: 300px;
+        }
         
         .tabela-relatorio {
             display: block;
@@ -426,25 +457,474 @@ $faturamento_por_servico = [
     }
 </style>
 
+<!-- Bibliotecas para exportação -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 <script>
     // Funções para exportação
     function exportarPDF() {
-        alert('Exportação para PDF será implementada aqui');
+        // Mostrar mensagem de carregamento
+        const loadingMsg = document.createElement('div');
+        loadingMsg.style.position = 'fixed';
+        loadingMsg.style.top = '50%';
+        loadingMsg.style.left = '50%';
+        loadingMsg.style.transform = 'translate(-50%, -50%)';
+        loadingMsg.style.padding = '20px';
+        loadingMsg.style.background = 'rgba(0,0,0,0.7)';
+        loadingMsg.style.color = 'white';
+        loadingMsg.style.borderRadius = '5px';
+        loadingMsg.style.zIndex = '9999';
+        loadingMsg.innerHTML = 'Gerando PDF, aguarde...';
+        document.body.appendChild(loadingMsg);
+        
+        // Usar window.jsPDF que é definido pelo script importado
+        const { jsPDF } = window.jspdf;
+        
+        // Criar um novo documento PDF
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const container = document.getElementById('relatorio-container');
+        
+        // Adicionar título
+        doc.setFontSize(18);
+        doc.setTextColor(11, 53, 86);
+        doc.text('Relatório de Atendimentos', 105, 15, { align: 'center' });
+        
+        // Adicionar data do relatório
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Período: ${document.getElementById('data_inicio').value} a ${document.getElementById('data_fim').value}`, 105, 22, { align: 'center' });
+        
+        // Capturar os cards de resumo
+        const resumoCards = document.querySelectorAll('.card-resumo');
+        let yPos = 30;
+        
+        doc.setFontSize(14);
+        doc.setTextColor(11, 53, 86);
+        doc.text('Resumo', 20, yPos);
+        yPos += 10;
+        
+        // Adicionar dados de resumo
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0);
+        resumoCards.forEach((card, index) => {
+            const titulo = card.querySelector('h3').textContent;
+            const valor = card.querySelector('.resumo-valor').textContent;
+            doc.text(`${titulo}: ${valor}`, 20, yPos);
+            yPos += 7;
+        });
+        
+        yPos += 10;
+        
+        // Adicionar tabela de detalhamento
+        doc.setFontSize(14);
+        doc.setTextColor(11, 53, 86);
+        doc.text('Detalhamento de Atendimentos', 20, yPos);
+        yPos += 10;
+        
+        // Capturar dados da tabela
+        const tabela = document.querySelector('.tabela-relatorio');
+        const cabecalhos = Array.from(tabela.querySelectorAll('th')).map(th => th.textContent);
+        const linhas = Array.from(tabela.querySelectorAll('tbody tr')).map(tr => 
+            Array.from(tr.querySelectorAll('td')).map(td => td.textContent)
+        );
+        
+        // Desenhar tabela
+        doc.setFontSize(8);
+        doc.setTextColor(0, 0, 0);
+        
+        // Cabeçalhos
+        const colWidths = [25, 35, 25, 35, 20]; // Larguras das colunas
+        let xPos = 20;
+        
+        // Fundo dos cabeçalhos
+        doc.setFillColor(242, 242, 242);
+        doc.rect(xPos, yPos - 5, colWidths.reduce((a, b) => a + b, 0), 7, 'F');
+        
+        // Texto dos cabeçalhos
+        cabecalhos.forEach((header, i) => {
+            doc.setFont(undefined, 'bold');
+            doc.text(header, xPos + 2, yPos);
+            xPos += colWidths[i];
+        });
+        
+        yPos += 7;
+        
+        // Linhas da tabela
+        linhas.forEach((linha, rowIndex) => {
+            xPos = 20;
+            
+            // Alternar cores de fundo das linhas
+            if (rowIndex % 2 === 1) {
+                doc.setFillColor(249, 249, 249);
+                doc.rect(xPos, yPos - 5, colWidths.reduce((a, b) => a + b, 0), 7, 'F');
+            }
+            
+            linha.forEach((celula, i) => {
+                doc.setFont(undefined, 'normal');
+                doc.text(celula, xPos + 2, yPos);
+                xPos += colWidths[i];
+            });
+            
+            yPos += 7;
+            
+            // Verificar se precisa de nova página
+            if (yPos > 270) {
+                doc.addPage();
+                yPos = 20;
+            }
+        });
+        
+        // Adicionar gráficos como imagens
+        setTimeout(() => {
+            // Capturar os gráficos como imagens
+            const graficos = document.querySelectorAll('.grafico canvas');
+            let graficoPromises = Array.from(graficos).map(grafico => 
+                html2canvas(grafico, {
+                    scale: 2,
+                    backgroundColor: null
+                })
+            );
+            
+            Promise.all(graficoPromises).then(canvases => {
+                // Adicionar nova página para os gráficos
+                doc.addPage();
+                
+                doc.setFontSize(18);
+                doc.setTextColor(11, 53, 86);
+                doc.text('Gráficos', 105, 15, { align: 'center' });
+                
+                let yPosGraficos = 25;
+                
+                // Adicionar cada gráfico
+                canvases.forEach((canvas, index) => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgWidth = 170;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    
+                    // Verificar se precisa de nova página
+                    if (yPosGraficos + imgHeight > 270) {
+                        doc.addPage();
+                        yPosGraficos = 20;
+                    }
+                    
+                    // Adicionar título do gráfico
+                    const tituloGrafico = document.querySelectorAll('.grafico-card h3')[index].textContent;
+                    doc.setFontSize(12);
+                    doc.setTextColor(11, 53, 86);
+                    doc.text(tituloGrafico, 20, yPosGraficos);
+                    
+                    // Adicionar o gráfico
+                    doc.addImage(imgData, 'PNG', 20, yPosGraficos + 5, imgWidth, imgHeight);
+                    
+                    yPosGraficos += imgHeight + 20;
+                });
+                
+                // Salvar o PDF
+                doc.save('relatorio-atendimentos.pdf');
+                
+                // Remover mensagem de carregamento
+                document.body.removeChild(loadingMsg);
+            });
+        }, 500);
     }
     
     function exportarExcel() {
-        alert('Exportação para Excel será implementada aqui');
+        // Mostrar mensagem de carregamento
+        const loadingMsg = document.createElement('div');
+        loadingMsg.style.position = 'fixed';
+        loadingMsg.style.top = '50%';
+        loadingMsg.style.left = '50%';
+        loadingMsg.style.transform = 'translate(-50%, -50%)';
+        loadingMsg.style.padding = '20px';
+        loadingMsg.style.background = 'rgba(0,0,0,0.7)';
+        loadingMsg.style.color = 'white';
+        loadingMsg.style.borderRadius = '5px';
+        loadingMsg.style.zIndex = '9999';
+        loadingMsg.innerHTML = 'Gerando Excel, aguarde...';
+        document.body.appendChild(loadingMsg);
+        
+        // Criar um novo workbook
+        const wb = XLSX.utils.book_new();
+        
+        // Adicionar uma planilha de resumo
+        const resumoData = [
+            ['Relatório de Atendimentos'],
+            [`Período: ${document.getElementById('data_inicio').value} a ${document.getElementById('data_fim').value}`],
+            [],
+            ['Resumo'],
+        ];
+        
+        // Adicionar dados de resumo
+        const resumoCards = document.querySelectorAll('.card-resumo');
+        resumoCards.forEach(card => {
+            const titulo = card.querySelector('h3').textContent;
+            const valor = card.querySelector('.resumo-valor').textContent;
+            resumoData.push([titulo, valor]);
+        });
+        
+        // Adicionar planilha de resumo
+        const resumoWs = XLSX.utils.aoa_to_sheet(resumoData);
+        XLSX.utils.book_append_sheet(wb, resumoWs, 'Resumo');
+        
+        // Adicionar uma planilha de detalhamento
+        const tabela = document.querySelector('.tabela-relatorio');
+        const cabecalhos = Array.from(tabela.querySelectorAll('th')).map(th => th.textContent);
+        const linhas = Array.from(tabela.querySelectorAll('tbody tr')).map(tr => 
+            Array.from(tr.querySelectorAll('td')).map(td => td.textContent)
+        );
+        
+        const detalhamentoData = [cabecalhos];
+        linhas.forEach(linha => detalhamentoData.push(linha));
+        
+        // Adicionar planilha de detalhamento
+        const detalhamentoWs = XLSX.utils.aoa_to_sheet(detalhamentoData);
+        XLSX.utils.book_append_sheet(wb, detalhamentoWs, 'Detalhamento');
+        
+        // Adicionar uma planilha para cada tipo de gráfico
+        // Serviços Populares
+        const servicosData = [
+            ['Serviços Mais Populares'],
+            [],
+            ['Serviço', 'Quantidade', 'Percentual']
+        ];
+        
+        // Dados simulados para serviços
+        const servicosPopulares = [
+            ['Consulta Veterinária', 45, '33%'],
+            ['Vacinação', 28, '21%'],
+            ['Banho e Tosa', 62, '46%']
+        ];
+        
+        servicosPopulares.forEach(servico => servicosData.push(servico));
+        
+        // Adicionar planilha de serviços
+        const servicosWs = XLSX.utils.aoa_to_sheet(servicosData);
+        XLSX.utils.book_append_sheet(wb, servicosWs, 'Serviços Populares');
+        
+        // Faturamento por Serviço
+        const faturamentoData = [
+            ['Faturamento por Serviço'],
+            [],
+            ['Serviço', 'Valor']
+        ];
+        
+        // Dados simulados para faturamento
+        const faturamentoServicos = [
+            ['Consulta Veterinária', 'R$ 6.750,00'],
+            ['Vacinação', 'R$ 3.360,00'],
+            ['Banho e Tosa', 'R$ 2.740,00']
+        ];
+        
+        faturamentoServicos.forEach(faturamento => faturamentoData.push(faturamento));
+        
+        // Adicionar planilha de faturamento
+        const faturamentoWs = XLSX.utils.aoa_to_sheet(faturamentoData);
+        XLSX.utils.book_append_sheet(wb, faturamentoWs, 'Faturamento');
+        
+        // Salvar o arquivo Excel
+        XLSX.writeFile(wb, 'relatorio-atendimentos.xlsx');
+        
+        // Remover mensagem de carregamento
+        document.body.removeChild(loadingMsg);
     }
     
-    // Simulação de renderização de gráficos
+    // Renderização dos gráficos com Chart.js
     document.addEventListener('DOMContentLoaded', function() {
-        // Aqui você implementaria a renderização real dos gráficos
-        // usando bibliotecas como Chart.js, ApexCharts, etc.
+        // Gráfico de consultas por dia
+        const ctxConsultas = document.getElementById('grafico-consultas').getContext('2d');
+        const consultasChart = new Chart(ctxConsultas, {
+            type: 'line',
+            data: {
+                labels: ['01/06', '02/06', '03/06', '04/06', '05/06', '06/06', '07/06'],
+                datasets: [{
+                    label: 'Consultas',
+                    data: [3, 5, 2, 4, 6, 3, 2],
+                    backgroundColor: 'rgba(11, 53, 86, 0.2)',
+                    borderColor: 'rgba(11, 53, 86, 1)',
+                    borderWidth: 2,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Consultas por Dia'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
         
-        // Exemplo de simulação visual
-        const graficos = document.querySelectorAll('.grafico-placeholder');
-        graficos.forEach(grafico => {
-            grafico.innerHTML = '<div style="width: 100%; height: 100%; background: linear-gradient(45deg, #0b3556, #0d4371); display: flex; align-items: center; justify-content: center; color: white;">Gráfico simulado</div>';
+        // Gráfico de serviços mais populares (pizza)
+        const ctxServicos = document.getElementById('grafico-servicos').getContext('2d');
+        const servicosChart = new Chart(ctxServicos, {
+            type: 'pie',
+            data: {
+                labels: ['Consulta Veterinária', 'Vacinação', 'Banho e Tosa'],
+                datasets: [{
+                    data: [45, 28, 62],
+                    backgroundColor: [
+                        'rgba(11, 53, 86, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(75, 192, 192, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(11, 53, 86, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Serviços Mais Populares'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Gráfico de faturamento por serviço (pizza)
+        const ctxFaturamento = document.getElementById('grafico-faturamento').getContext('2d');
+        const faturamentoChart = new Chart(ctxFaturamento, {
+            type: 'pie',
+            data: {
+                labels: ['Consulta Veterinária', 'Vacinação', 'Banho e Tosa'],
+                datasets: [{
+                    data: [6750, 3360, 2740],
+                    backgroundColor: [
+                        'rgba(11, 53, 86, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(75, 192, 192, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(11, 53, 86, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Faturamento por Serviço'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return `${label}: R$ ${value.toFixed(2).replace('.', ',')} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Adicionar um novo gráfico de pizza para distribuição por espécie
+        const ctxEspecies = document.createElement('canvas');
+        ctxEspecies.id = 'grafico-especies';
+        
+        const graficoCard = document.createElement('div');
+        graficoCard.className = 'grafico-card';
+        graficoCard.innerHTML = '<h3>Distribuição por Espécie</h3>';
+        
+        const graficoContainer = document.createElement('div');
+        graficoContainer.className = 'grafico';
+        graficoContainer.appendChild(ctxEspecies);
+        
+        graficoCard.appendChild(graficoContainer);
+        document.querySelector('.graficos-container').appendChild(graficoCard);
+        
+        const especiesChart = new Chart(ctxEspecies, {
+            type: 'pie',
+            data: {
+                labels: ['Cães', 'Gatos', 'Aves', 'Outros'],
+                datasets: [{
+                    data: [65, 25, 7, 3],
+                    backgroundColor: [
+                        'rgba(11, 53, 86, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(153, 102, 255, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(11, 53, 86, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Distribuição por Espécie'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
         });
     });
 </script>

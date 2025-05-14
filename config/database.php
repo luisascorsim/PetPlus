@@ -3,7 +3,7 @@
 $host = 'localhost';
 $dbname = 'petplus';
 $username = 'root';
-$password = 'PUC@1234';
+$password = '';
 $charset = 'utf8mb4';
 
 // Opções do PDO

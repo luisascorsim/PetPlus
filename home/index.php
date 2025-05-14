@@ -14,6 +14,7 @@ require_once('../includes/sidebar.php');
 require_once('../conecta_db.php');
 $conn = conecta_db();
 
+
 // Busca dados do usuário logado
 $query = "SELECT nome, email FROM Usuarios WHERE id_usuario = ?";
 $stmt = $conn->prepare($query);
@@ -63,6 +64,7 @@ if (!$usuario) {
         <i class="fas fa-syringe"></i>
         Vacinas
       </a>
+      
     </div>
   </div>
 </div>

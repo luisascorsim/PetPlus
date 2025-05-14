@@ -31,64 +31,32 @@ $mensagem = '';
 $tipo_mensagem = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Verifica qual formulário foi enviado
-    if (isset($_POST['form_tipo']) && $_POST['form_tipo'] == 'peso') {
-        // Formulário de peso
-        $pet_id = $_POST['pet_id'];
-        $data = $_POST['data_peso'];
-        $peso = $_POST['peso'];
+    // Formulário de vacina
+    $pet_id = $_POST['pet_id'];
+    $nome_vacina = $_POST['nome_vacina'];
+    $data_vacina = $_POST['data_vacina'];
+    $lote = $_POST['lote'];
+    $reforco = $_POST['reforco'];
+    
+    // Validações
+    if (empty($pet_id) || empty($nome_vacina) || empty($data_vacina)) {
+        $mensagem = "Todos os campos obrigatórios devem ser preenchidos.";
+        $tipo_mensagem = "erro";
+    } else {
+        // Inserir na tabela vacinas
+        $sql = "INSERT INTO vacinas (pet_id, nome, data, lote, reforco) VALUES (?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("issss", $pet_id, $nome_vacina, $data_vacina, $lote, $reforco);
         
-        // Validações
-        if (empty($pet_id) || empty($data) || !isset($peso)) {
-            $mensagem = "Todos os campos obrigatórios devem ser preenchidos.";
-            $tipo_mensagem = "erro";
-        } else if ($peso <= 0) {
-            $mensagem = "O peso deve ser maior que zero.";
-            $tipo_mensagem = "erro";
+        if ($stmt->execute()) {
+            $mensagem = "Vacina registrada com sucesso!";
+            $tipo_mensagem = "sucesso";
         } else {
-            // Inserir na tabela pesos
-            $sql = "INSERT INTO pesos (pet_id, data, peso) VALUES (?, ?, ?)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("isd", $pet_id, $data, $peso);
-            
-            if ($stmt->execute()) {
-                $mensagem = "Peso registrado com sucesso!";
-                $tipo_mensagem = "sucesso";
-            } else {
-                $mensagem = "Erro ao registrar peso: " . $stmt->error;
-                $tipo_mensagem = "erro";
-            }
-            
-            $stmt->close();
+            $mensagem = "Erro ao registrar vacina: " . $stmt->error;
+            $tipo_mensagem = "erro";
         }
-    } else if (isset($_POST['form_tipo']) && $_POST['form_tipo'] == 'vacina') {
-        // Formulário de vacina
-        $pet_id = $_POST['pet_id'];
-        $nome_vacina = $_POST['nome_vacina'];
-        $data_vacina = $_POST['data_vacina'];
-        $lote = $_POST['lote'];
-        $reforco = $_POST['reforco'];
         
-        // Validações
-        if (empty($pet_id) || empty($nome_vacina) || empty($data_vacina)) {
-            $mensagem = "Todos os campos obrigatórios devem ser preenchidos.";
-            $tipo_mensagem = "erro";
-        } else {
-            // Inserir na tabela vacinas
-            $sql = "INSERT INTO vacinas (pet_id, nome, data, lote, reforco) VALUES (?, ?, ?, ?, ?)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("issss", $pet_id, $nome_vacina, $data_vacina, $lote, $reforco);
-            
-            if ($stmt->execute()) {
-                $mensagem = "Vacina registrada com sucesso!";
-                $tipo_mensagem = "sucesso";
-            } else {
-                $mensagem = "Erro ao registrar vacina: " . $stmt->error;
-                $tipo_mensagem = "erro";
-            }
-            
-            $stmt->close();
-        }
+        $stmt->close();
     }
 }
 ?>
@@ -98,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Controle de Peso e Vacinas - PetPlus</title>
+    <title>Controle de Vacinas - PetPlus</title>
     <style>
         body {
             font-family: 'Quicksand', sans-serif;
@@ -183,34 +151,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             border: 1px solid #f5c6cb;
         }
 
-        .tabs {
-            display: flex;
-            margin-bottom: 20px;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 10px;
-            text-align: center;
-            background-color: #f0f0f0;
-            cursor: pointer;
-            border-radius: 6px 6px 0 0;
-            font-weight: bold;
-        }
-
-        .tab.active {
-            background-color: #003b66;
-            color: white;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
         table {
             width: 100%;
             border-collapse: collapse;
@@ -257,7 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body>
     <div class="container">
         <div class="card">
-            <h1>Controle de Peso e Vacinas</h1>
+            <h1>Controle de Vacinas</h1>
             
             <?php if ($mensagem): ?>
                 <div class="mensagem <?php echo $tipo_mensagem === 'sucesso' ? 'mensagem-sucesso' : 'mensagem-erro'; ?>">
@@ -275,91 +215,48 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </select>
             </div>
             
-            <div class="tabs">
-                <div class="tab active" onclick="showTab('peso')">Registro de Peso</div>
-                <div class="tab" onclick="showTab('vacina')">Registro de Vacina</div>
-            </div>
-            
-            <div id="tab-peso" class="tab-content active">
-                <form action="vacinas-peso.php" method="POST">
-                    <input type="hidden" name="form_tipo" value="peso">
-                    <input type="hidden" id="peso_pet_id" name="pet_id" value="">
-                    
-                    <div class="form-group">
-                        <label for="data_peso">Data da Medição:</label>
-                        <input type="date" id="data_peso" name="data_peso" required />
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="peso">Peso (kg):</label>
-                        <input type="number" id="peso" name="peso" min="0.1" step="0.1" required />
-                    </div>
-                    
-                    <button type="submit" class="btn-submit">Registrar Peso</button>
-                </form>
+            <form action="vacinas-peso.php" method="POST">
+                <input type="hidden" id="vacina_pet_id" name="pet_id" value="">
                 
-                <div id="historico-peso" style="display: none;">
-                    <h3>Histórico de Peso</h3>
-                    <table id="tabela-peso">
-                        <thead>
-                            <tr>
-                                <th>Data</th>
-                                <th>Peso (kg)</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="lista-pesos">
-                            <!-- Será preenchido via JavaScript -->
-                        </tbody>
-                    </table>
+                <div class="form-group">
+                    <label for="nome_vacina">Nome da Vacina:</label>
+                    <input type="text" id="nome_vacina" name="nome_vacina" required />
                 </div>
-            </div>
-            
-            <div id="tab-vacina" class="tab-content">
-                <form action="vacinas-peso.php" method="POST">
-                    <input type="hidden" name="form_tipo" value="vacina">
-                    <input type="hidden" id="vacina_pet_id" name="pet_id" value="">
-                    
-                    <div class="form-group">
-                        <label for="nome_vacina">Nome da Vacina:</label>
-                        <input type="text" id="nome_vacina" name="nome_vacina" required />
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="data_vacina">Data da Aplicação:</label>
-                        <input type="date" id="data_vacina" name="data_vacina" required />
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="lote">Lote:</label>
-                        <input type="text" id="lote" name="lote" />
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="reforco">Data do Reforço:</label>
-                        <input type="date" id="reforco" name="reforco" />
-                    </div>
-                    
-                    <button type="submit" class="btn-submit">Registrar Vacina</button>
-                </form>
                 
-                <div id="historico-vacina" style="display: none;">
-                    <h3>Histórico de Vacinas</h3>
-                    <table id="tabela-vacina">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>Data</th>
-                                <th>Lote</th>
-                                <th>Reforço</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="lista-vacinas">
-                            <!-- Será preenchido via JavaScript -->
-                        </tbody>
-                    </table>
+                <div class="form-group">
+                    <label for="data_vacina">Data da Aplicação:</label>
+                    <input type="date" id="data_vacina" name="data_vacina" required />
                 </div>
+                
+                <div class="form-group">
+                    <label for="lote">Lote:</label>
+                    <input type="text" id="lote" name="lote" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="reforco">Data do Reforço:</label>
+                    <input type="date" id="reforco" name="reforco" />
+                </div>
+                
+                <button type="submit" class="btn-submit">Registrar Vacina</button>
+            </form>
+            
+            <div id="historico-vacina" style="display: none; margin-top: 30px;">
+                <h3>Histórico de Vacinas</h3>
+                <table id="tabela-vacina">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Data</th>
+                            <th>Lote</th>
+                            <th>Reforço</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-vacinas">
+                        <!-- Será preenchido via JavaScript -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -367,83 +264,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <script>
         let petSelecionado = null;
         
-        // Função para alternar entre as abas
-        function showTab(tabName) {
-            // Atualiza as classes das abas
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelector(`.tab[onclick="showTab('${tabName}')"]`).classList.add('active');
-            
-            // Atualiza o conteúdo visível
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            document.getElementById(`tab-${tabName}`).classList.add('active');
-        }
-        
         // Função para selecionar um pet
         function selecionarPet(petId) {
             petSelecionado = petId;
             
-            // Atualiza os campos hidden dos formulários
-            document.getElementById('peso_pet_id').value = petId;
+            // Atualiza o campo hidden do formulário
             document.getElementById('vacina_pet_id').value = petId;
             
             if (petId) {
                 // Carrega os dados do pet selecionado
-                carregarHistoricoPeso(petId);
                 carregarHistoricoVacinas(petId);
                 
-                // Mostra os históricos
-                document.getElementById('historico-peso').style.display = 'block';
+                // Mostra o histórico
                 document.getElementById('historico-vacina').style.display = 'block';
             } else {
-                // Esconde os históricos se nenhum pet estiver selecionado
-                document.getElementById('historico-peso').style.display = 'none';
+                // Esconde o histórico se nenhum pet estiver selecionado
                 document.getElementById('historico-vacina').style.display = 'none';
             }
-        }
-        
-        // Função para carregar o histórico de peso
-        function carregarHistoricoPeso(petId) {
-            fetch(`api/peso/listarPesos.php?pet_id=${petId}`)
-                .then(response => response.json())
-                .then(data => {
-                    renderizarTabelaPeso(data);
-                })
-                .catch(error => {
-                    console.error('Erro ao carregar histórico de peso:', error);
-                    // Dados de exemplo para teste quando a API falha
-                    const pesosExemplo = [
-                        { id: 1, data: '2023-05-15', peso: 10.5 },
-                        { id: 2, data: '2023-06-20', peso: 11.2 }
-                    ];
-                    renderizarTabelaPeso(pesosExemplo);
-                });
-        }
-        
-        // Função para renderizar a tabela de pesos
-        function renderizarTabelaPeso(pesos) {
-            const tbody = document.getElementById('lista-pesos');
-            tbody.innerHTML = '';
-            
-            if (!Array.isArray(pesos) || pesos.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3">Nenhum registro de peso encontrado</td></tr>';
-                return;
-            }
-            
-            pesos.forEach(peso => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${formatarData(peso.data)}</td>
-                    <td>${peso.peso} kg</td>
-                    <td>
-                        <button class="btn-danger" onclick="excluirPeso(${peso.id})">Excluir</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
         }
         
         // Função para carregar o histórico de vacinas
@@ -487,22 +324,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 `;
                 tbody.appendChild(tr);
             });
-        }
-        
-        // Função para excluir um registro de peso
-        function excluirPeso(id) {
-            if (!confirm('Tem certeza que deseja excluir este registro de peso?')) return;
-            
-            fetch(`api/peso/excluirPeso.php?id=${id}`)
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.mensagem || 'Registro excluído com sucesso!');
-                    carregarHistoricoPeso(petSelecionado);
-                })
-                .catch(error => {
-                    console.error('Erro ao excluir registro de peso:', error);
-                    alert('Erro ao excluir registro. Verifique o console para mais detalhes.');
-                });
         }
         
         // Função para excluir um registro de vacina

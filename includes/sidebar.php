@@ -45,11 +45,7 @@ function isActive($pagina) {
             <h3 class="category-title">Principal</h3>
             <a href="<?php echo $caminhoBase; ?>home/index.php" class="menu-item <?php echo isActive('home/index.php'); ?>">
                 <i class="fas fa-home"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="<?php echo $caminhoBase; ?>agenda/agenda.php" class="menu-item <?php echo isActive('agenda/agenda.php'); ?>">
-                <i class="fas fa-calendar-alt"></i>
-                <span>Agenda</span>
+                <span>Home</span>
             </a>
         </div>
         
@@ -57,11 +53,7 @@ function isActive($pagina) {
             <h3 class="category-title">Gerenciamento</h3>
             <a href="<?php echo $caminhoBase; ?>cadastrar_pet/cadastrar_pets.php" class="menu-item <?php echo isActive('cadastrar_pet/cadastrar_pets.php'); ?>">
                 <i class="fas fa-paw"></i>
-                <span>Cadastro de Pets</span>
-            </a>
-            <a href="<?php echo $caminhoBase; ?>clientes/clientes.php" class="menu-item <?php echo isActive('clientes/clientes.php'); ?>" onclick="event.preventDefault(); window.location.href='<?php echo $caminhoBase; ?>clientes/clientes.php';">
-                <i class="fas fa-users"></i>
-                <span>Clientes</span>
+                <span>Cadastros</span>
             </a>
             <a href="<?php echo $caminhoBase; ?>servicos/servicos.php" class="menu-item <?php echo isActive('servicos/servicos.php'); ?>">
                 <i class="fas fa-concierge-bell"></i>
@@ -75,13 +67,9 @@ function isActive($pagina) {
                 <i class="fas fa-clipboard-list"></i>
                 <span>Consultas</span>
             </a>
-            <a href="<?php echo $caminhoBase; ?>diagnostico_consulta/diagnostico-consulta.php" class="menu-item <?php echo isActive('diagnostico_consulta/diagnostico-consulta.php'); ?>">
-                <i class="fas fa-stethoscope"></i>
-                <span>Prontuários</span>
-            </a>
             <a href="<?php echo $caminhoBase; ?>vacinas_e_controle_do_peso/vacinas-peso.php" class="menu-item <?php echo isActive('vacinas_e_controle_do_peso/vacinas-peso.php'); ?>">
                 <i class="fas fa-syringe"></i>
-                <span>Vacinas e Peso</span>
+                <span>Vacinas</span>
             </a>
         </div>
         
@@ -96,26 +84,7 @@ function isActive($pagina) {
                 <span>Relatórios</span>
             </a>
         </div>
-        
-        <div class="menu-category">
-            <h3 class="category-title">Sistema</h3>
-            <a href="<?php echo $caminhoBase; ?>perfil/meu-perfil.php" class="menu-item <?php echo isActive('perfil/meu-perfil.php'); ?>">
-                <i class="fas fa-user-circle"></i>
-                <span>Meu Perfil</span>
-            </a>
-            <a href="<?php echo $caminhoBase; ?>configuracoes/sistema.php" class="menu-item <?php echo isActive('configuracoes/sistema.php'); ?>">
-                <i class="fas fa-cog"></i>
-                <span>Configurações</span>
-            </a>
-        </div>
     </nav>
-    
-    <div class="sidebar-footer">
-        <a href="<?php echo $caminhoBase; ?>logout.php" class="logout-btn">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Sair</span>
-        </a>
-    </div>
 </aside>
 
 <div class="mobile-toggle">
@@ -135,6 +104,32 @@ function isActive($pagina) {
         z-index: 900;
         transition: width 0.3s;
         box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    }
+    
+    .sidebar-header {
+        padding: 15px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .user-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .user-name {
+        font-weight: bold;
+        font-size: 14px;
+    }
+    
+    .logout-link {
+        color: rgba(255,255,255,0.8);
+        text-decoration: none;
+        font-size: 12px;
+    }
+    
+    .logout-link:hover {
+        color: white;
     }
 
     .menu-category {
@@ -178,33 +173,6 @@ function isActive($pagina) {
         font-weight: 500;
     }
 
-    .sidebar-footer {
-        padding: 15px;
-        border-top: 1px solid rgba(255,255,255,0.1);
-        position: sticky;
-        bottom: 0;
-        background-color: #003b66;
-    }
-
-    .logout-btn {
-        display: flex;
-        align-items: center;
-        color: rgba(255,255,255,0.8);
-        text-decoration: none;
-        padding: 10px;
-        border-radius: 5px;
-        transition: all 0.2s;
-    }
-
-    .logout-btn i {
-        margin-right: 10px;
-    }
-
-    .logout-btn:hover {
-        background-color: rgba(255,0,0,0.2);
-        color: white;
-    }
-
     .mobile-toggle {
         display: none;
         position: fixed;
@@ -236,14 +204,14 @@ function isActive($pagina) {
         .sidebar-header h2,
         .menu-item span,
         .category-title,
-        .logout-btn span {
+        .user-name {
             display: none;
         }
 
         .sidebar.expanded .sidebar-header h2,
         .sidebar.expanded .menu-item span,
         .sidebar.expanded .category-title,
-        .sidebar.expanded .logout-btn span {
+        .sidebar.expanded .user-name {
             display: block;
         }
 
