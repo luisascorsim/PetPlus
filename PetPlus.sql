@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS Usuarios (
     ultimo_acesso TIMESTAMP NULL
 );
 
--- Tabela de Tutores (Clientes)
-CREATE TABLE IF NOT EXISTS clientes (
+-- Tabela de Tutores
+CREATE TABLE IF NOT EXISTS Tutor (
     id_tutor INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100),
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS clientes (
 );
 
 -- Tabela de Pets
-CREATE TABLE IF NOT EXISTS Pet (
+CREATE TABLE IF NOT EXISTS Pets (
     id_pet INT AUTO_INCREMENT PRIMARY KEY,
     id_tutor INT,
     nome VARCHAR(50) NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS Pet (
     cor VARCHAR(50),
     peso DECIMAL(5,2),
     observacoes TEXT,
-    FOREIGN KEY (id_tutor) REFERENCES clientes(id_tutor) ON DELETE CASCADE
+    FOREIGN KEY (id_tutor) REFERENCES Tutor(id_tutor) ON DELETE CASCADE
 );
 
 -- Criação da tabela de consultas
@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS Peso (
     peso DECIMAL(5,2) NOT NULL,
     data_registro DATE NOT NULL,
     observacoes TEXT,
-    FOREIGN KEY (pet_id) REFERENCES Pet(id_pet) ON DELETE CASCADE
+    FOREIGN KEY (pet_id) REFERENCES Pets(id_pet) ON DELETE CASCADE
 );
 
 -- Tabela de Faturas
@@ -124,8 +124,8 @@ CREATE TABLE IF NOT EXISTS Faturas (
     clinica VARCHAR(100) NOT NULL,
     profissional VARCHAR(100) NOT NULL,
     status ENUM('pago', 'pendente', 'cancelado') DEFAULT 'pendente',
-    FOREIGN KEY (tutor_id) REFERENCES clientes(id_tutor) ON DELETE CASCADE,
-    FOREIGN KEY (pet_id) REFERENCES Pet(id_pet) ON DELETE CASCADE
+    FOREIGN KEY (tutor_id) REFERENCES Tutor(id_tutor) ON DELETE CASCADE,
+    FOREIGN KEY (pet_id) REFERENCES Pets(id_pet) ON DELETE CASCADE
 );
 
 -- Tabela de Agendamentos
@@ -145,13 +145,13 @@ INSERT INTO Usuarios (nome, email, senha, cpf, data_nasc) VALUES
 ('Administrador', 'admin@petplus.com', '$2y$10$8MJO1GyYGrCZgD.OUgKqWOoC9Vc0HOTSsM7Vx5OzXIchcVrXIQS4m', '123.456.789-00', '1990-01-01');
 
 -- Inserir dados de exemplo para tutores
-INSERT INTO clientes (nome, email, telefone, endereco) VALUES
+INSERT INTO tutor (nome, email, telefone, endereco) VALUES
 ('João Silva', 'joao@email.com', '(11) 98765-4321', 'Rua das Flores, 123'),
 ('Maria Oliveira', 'maria@email.com', '(11) 91234-5678', 'Av. Principal, 456'),
 ('Carlos Santos', 'carlos@email.com', '(11) 99876-5432', 'Rua do Comércio, 789');
 
 -- Inserir dados de exemplo para pets
-INSERT INTO Pet (id_tutor, nome, especie, raca, data_nascimento, sexo, cor, peso) VALUES
+INSERT INTO Pets (id_tutor, nome, especie, raca, data_nascimento, sexo, cor, peso) VALUES
 (1, 'Rex', 'Cachorro', 'Labrador', '2019-05-10', 'M', 'Caramelo', 25.5),
 (1, 'Luna', 'Gato', 'Siamês', '2020-03-15', 'F', 'Branco', 4.2),
 (2, 'Mel', 'Cachorro', 'Golden Retriever', '2018-07-22', 'F', 'Dourado', 28.0),

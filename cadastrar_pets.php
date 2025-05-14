@@ -139,7 +139,7 @@ $nome_usuario = $_SESSION['usuario_nome'];
                     <div class="form-row">
                         <div class="form-group">
                             <label for="pet-owner">Proprietário</label>
-                            <select id="pet-owner" name="cliente_id" required>
+                            <select id="pet-owner" name="tutor_id" required>
                                 <option value="">Selecione</option>
                                 <!-- Opções serão carregadas via JavaScript -->
                             </select>

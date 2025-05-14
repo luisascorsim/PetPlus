@@ -21,10 +21,10 @@ try {
     $stmt->execute();
     $total_pets = $stmt->fetch()['total'];
     
-    // Total de clientes
-    $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM clientes");
+    // Total de tutores
+    $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM tutor");
     $stmt->execute();
-    $total_clientes = $stmt->fetch()['total'];
+    $total_tutor = $stmt->fetch()['total'];
     
     // Total de consultas
     $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM consultas");
@@ -33,10 +33,10 @@ try {
     
     // Consultas recentes
     $stmt = $pdo->prepare("
-        SELECT c.id, c.data_hora, c.status, p.nome as pet_nome, cl.nome as cliente_nome
+        SELECT c.id, c.data_hora, c.status, p.nome as pet_nome, tt.nome as tutor_nome
         FROM consultas c
         JOIN pets p ON c.pet_id = p.id
-        JOIN clientes cl ON p.cliente_id = cl.id
+        JOIN tutor cl ON p.tutor_id = tt.id
         ORDER BY c.data_hora DESC
         LIMIT 5
     ");
@@ -102,8 +102,8 @@ try {
                         <i class="fas fa-users"></i>
                     </div>
                     <div class="stat-info">
-                        <h3>Total de Clientes</h3>
-                        <p><?php echo $total_clientes ?? 0; ?></p>
+                        <h3>Total de tutores</h3>
+                        <p><?php echo $total_tutor ?? 0; ?></p>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -137,7 +137,7 @@ try {
                             <thead>
                                 <tr>
                                     <th>Pet</th>
-                                    <th>Cliente</th>
+                                    <th>Tutor</th>
                                     <th>Data/Hora</th>
                                     <th>Status</th>
                                 </tr>
@@ -147,7 +147,7 @@ try {
                                     <?php foreach ($consultas_recentes as $consulta): ?>
                                         <tr>
                                             <td><?php echo htmlspecialchars($consulta['pet_nome']); ?></td>
-                                            <td><?php echo htmlspecialchars($consulta['cliente_nome']); ?></td>
+                                            <td><?php echo htmlspecialchars($consulta['tutor_nome']); ?></td>
                                             <td><?php echo date('d/m/Y H:i', strtotime($consulta['data_hora'])); ?></td>
                                             <td>
                                                 <span class="status-badge status-<?php echo strtolower($consulta['status']); ?>">
@@ -181,7 +181,7 @@ try {
                         </a>
                         <a href="clientes/clientes.php" class="action-card">
                             <i class="fas fa-user-plus"></i>
-                            <span>Novo Cliente</span>
+                            <span>Novo Tutor</span>
                         </a>
                         <a href="vacinas_e_controle_do_peso/vacinas-peso.php" class="action-card">
                             <i class="fas fa-syringe"></i>
