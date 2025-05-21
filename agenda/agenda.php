@@ -8,9 +8,9 @@ if (session_status() == PHP_SESSION_NONE) {
 if (!isset($_SESSION['id_usuario']) && !isset($_SESSION['usuario_id'])) {
     // Para desenvolvimento, criar uma sessão temporária
     $_SESSION['usuario_id'] = 1;
-    $_SESSION['usuario_nome'] = 'Administrador';
-    $_SESSION['usuario_email'] = 'admin@petplus.com';
-    $_SESSION['usuario_tipo'] = 'admin';
+    $_SESSION['usuario_nome'] = '';
+    $_SESSION['usuario_email'] = '';
+    $_SESSION['usuario_tipo'] = '';
 }
 
 // Define o caminho base para os recursos
@@ -467,7 +467,7 @@ $agendamentos = [
         ],
         '3': [
             { id: 4, nome: 'Mel (Golden Retriever)' },
-            { id: 5, nome: 'Bob (  }
+            { id: 5, nome: 'Bob ( v )'}
         ],
         '3': [
             { id: 4, nome: 'Mel (Golden Retriever)' },

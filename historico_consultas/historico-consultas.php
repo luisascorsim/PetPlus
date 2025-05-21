@@ -23,7 +23,7 @@ $conn = conecta_db();
 
 // Busca todos os pets para o dropdown
 $query = "SELECT p.id_pet, p.nome, t.nome as nome_tutor 
-        FROM Pet p 
+        FROM Pets p 
         JOIN Tutor t ON p.id_tutor = t.id_tutor 
         ORDER BY p.nome";
 $result = $conn->query($query);

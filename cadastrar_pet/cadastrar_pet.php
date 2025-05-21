@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $id_tutor = 1;
     
     // Inserir na tabela Pet
-    $sql = "INSERT INTO Pet (id_tutor, nome, especie, raca, idade, sexo, peso_atual, descricao) 
+    $sql = "INSERT INTO Pets (id_tutor, nome, especie, raca, idade, sexo, peso_atual, descricao) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     
     $stmt = $conn->prepare($sql);

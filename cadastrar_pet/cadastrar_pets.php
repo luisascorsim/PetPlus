@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         try {
             if ($id_pet) {
                 // Atualiza os dados do pet
-                $sql = "UPDATE Pet SET id_tutor = ?, nome = ?, especie = ?, raca = ?, idade = ?, sexo = ?, descricao = ? WHERE id_pet = ?";
+                $sql = "UPDATE Pets SET id_tutor = ?, nome = ?, especie = ?, raca = ?, idade = ?, sexo = ?, descricao = ? WHERE id_pet = ?";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("isssisdi", $id_tutor, $nome_pet, $especie, $raca, $idade, $sexo, $descricao, $id_pet);
                 $stmt->execute();
@@ -118,7 +118,7 @@ if ($result && $result->num_rows > 0) {
 
 // Busca todos os pets
 $sql = "SELECT p.*, t.nome as nome_tutor, t.telefone, t.endereco 
-        FROM Pet p 
+        FROM Pets p 
         JOIN Tutor t ON p.id_tutor = t.id_tutor 
         ORDER BY p.nome";
 $result = $conn->query($sql);
@@ -136,7 +136,7 @@ if (isset($_GET['editar']) && is_numeric($_GET['editar'])) {
     $id_pet = (int)$_GET['editar'];
     
     $sql = "SELECT p.*, t.nome as nome_tutor, t.telefone, t.endereco 
-            FROM Pet p 
+            FROM Pets p 
             JOIN Tutor t ON p.id_tutor = t.id_tutor 
             WHERE p.id_pet = ?";
     $stmt = $conn->prepare($sql);

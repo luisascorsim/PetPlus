@@ -21,8 +21,7 @@ $id = intval($_GET['id']);
 
 try {
     // Buscar dados da consulta
-    $stmt = $pdo->prepare("
-        SELECT c.id, c.pet_id, c.tipo_consulta, c.data_hora, c.veterinario_id, c.status, c.observacoes,
+    $stmt = $pdo->prepare("SELECT c.id, c.pet_id, c.tipo_consulta, c.data_hora, c.veterinario_id, c.status, c.observacoes,
                p.nome as pet_nome, cl.nome as cliente_nome, v.nome as veterinario_nome
         FROM consultas c
         JOIN pets p ON c.pet_id = p.id

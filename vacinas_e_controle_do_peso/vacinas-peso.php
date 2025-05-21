@@ -17,7 +17,7 @@ require_once('../conecta_db.php');
 $conn = conecta_db();
 
 // Busca todos os pets para o dropdown
-$query = "SELECT id_pet, nome FROM Pet ORDER BY nome";
+$query = "SELECT id_pet, nome FROM Pets ORDER BY nome";
 $result = $conn->query($query);
 $pets = [];
 if ($result && $result->num_rows > 0) {

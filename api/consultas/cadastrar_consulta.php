@@ -28,13 +28,13 @@ require_once '../../config/database.php';
 
 try {
     // Verificar disponibilidade do horário
-    $stmt = $pdo->prepare("
-        SELECT COUNT(*) as total 
+    $stmt = $pdo->prepare("SELECT COUNT(*) as total 
         FROM consultas 
         WHERE veterinario_id = :veterinario_id 
         AND data_hora = :data_hora 
         AND status != 'cancelada'
     ");
+
     
     $stmt->bindParam(':veterinario_id', $data['veterinario_id']);
     $stmt->bindParam(':data_hora', $data['data_hora']);
@@ -48,8 +48,7 @@ try {
     }
     
     // Inserir consulta
-    $stmt = $pdo->prepare("
-        INSERT INTO consultas (pet_id, tipo_consulta, data_hora, veterinario_id, status, observacoes, data_criacao)
+    $stmt = $pdo->prepare("INSERT INTO consultas (pet_id, tipo_consulta, data_hora, veterinario_id, status, observacoes, data_criacao)
         VALUES (:pet_id, :tipo_consulta, :data_hora, :veterinario_id, :status, :observacoes, NOW())
     ");
     

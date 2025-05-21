@@ -5,7 +5,7 @@
  * @return mysqli Conexão com o banco de dados
  */
 function conecta_db() {
-    $db_name = "PetPlus";
+    $db_name = "petPlus";
     $user = "root";
     $pass = "";
     $server = "localhost";

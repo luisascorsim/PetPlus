@@ -61,8 +61,7 @@ try {
     }
     
     // Atualizar consulta
-    $stmt = $pdo->prepare("
-        UPDATE consultas SET
+    $stmt = $pdo->prepare("UPDATE consultas SET
             pet_id = :pet_id,
             tipo_consulta = :tipo_consulta,
             data_hora = :data_hora,
