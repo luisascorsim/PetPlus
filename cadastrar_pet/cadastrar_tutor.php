@@ -16,12 +16,26 @@ $tipo_mensagem = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Dados do tutor
-    $nome_tutor = isset($_POST['nome_tutor']) ? trim($_POST['nome_tutor']) : '';
-    $cpf_tutor = isset($_POST['cpf_tutor']) ? trim($_POST['cpf_tutor']) : '';
-    $telefone_tutor = isset($_POST['telefone_tutor']) ? trim($_POST['telefone_tutor']) : '';
-    $email_tutor = isset($_POST['email_tutor']) ? trim($_POST['email_tutor']) : '';
-    $endereco_tutor = isset($_POST['endereco_tutor']) ? trim($_POST['endereco_tutor']) : '';
-    
+    $nome_tutor = isset($_POST['nome']) ? trim($_POST['nome']) : '';
+    $cpf_tutor = isset($_POST['cpf']) ? trim($_POST['cpf']) : '';
+    $email_tutor = isset($_POST['email']) ? trim($_POST['email']) : '';
+    $telefone_tutor = isset($_POST['telefone']) ? trim($_POST['telefone']) : '';
+    $endereco_tutor = isset($_POST['endereco']) ? trim($_POST['endereco']) : '';
+
+    // Inserir novo tutor
+    $sql = "INSERT INTO Tutor (nome, cpf, email, telefone,  endereco) VALUES (?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sssss", $nome_tutor, $cpf_limpo, $email_tutor, $telefone_tutor, $endereco_tutor);
+                
+    if ($stmt->execute()) {
+    $mensagem = "Tutor cadastrado com sucesso!";
+    $tipo_mensagem = "sucesso";
+                    
+    } else {
+        $mensagem = "Erro ao cadastrar tutor: " . $conn->error;
+        $tipo_mensagem = "erro";
+    }
+               
     // Validações
     if (empty($nome_tutor) || empty($cpf_tutor) || empty($telefone_tutor)) {
         $mensagem = "Nome, CPF e telefone são campos obrigatórios.";
@@ -46,22 +60,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $mensagem = "Este CPF já está cadastrado no sistema.";
                 $tipo_mensagem = "erro";
             } else {
-                // Inserir novo tutor
-                $sql = "INSERT INTO Tutor (nome, cpf, telefone, email, endereco) VALUES (?, ?, ?, ?, ?)";
-                $stmt = $conn->prepare($sql);
-                $stmt->bind_param("sssss", $nome_tutor, $cpf_limpo, $telefone_tutor, $email_tutor, $endereco_tutor);
-                
-                if ($stmt->execute()) {
-                    $mensagem = "Tutor cadastrado com sucesso!";
-                    $tipo_mensagem = "sucesso";
-                    
-                    // Redirecionar para a página de cadastro de pets
-                    header("Location: cadastrar_pets.php?mensagem=" . urlencode($mensagem) . "&tipo=" . urlencode($tipo_mensagem));
-                    exit();
-                } else {
-                    $mensagem = "Erro ao cadastrar tutor: " . $conn->error;
-                    $tipo_mensagem = "erro";
-                }
+                // Redirecionar para a página de cadastro de pets
+                header("Location: cadastrar_pets.php?mensagem=" . urlencode($mensagem) . "&tipo=" . urlencode($tipo_mensagem));
+                exit();
             }
         }
     }

@@ -28,12 +28,12 @@ $tipo_mensagem = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Dados do tutor
-    $nome_tutor = isset($_POST['nome_tutor']) ? trim($_POST['nome_tutor']) : '';
-    $cpf_tutor = isset($_POST['cpf_tutor']) ? trim($_POST['cpf_tutor']) : '';
-    $telefone_tutor = isset($_POST['telefone_tutor']) ? trim($_POST['telefone_tutor']) : '';
-    $email_tutor = isset($_POST['email_tutor']) ? trim($_POST['email_tutor']) : '';
-    $endereco_tutor = isset($_POST['endereco_tutor']) ? trim($_POST['endereco_tutor']) : '';
-    
+    $nome_tutor = isset($_POST['nome']) ? trim($_POST['nome']) : '';
+    $cpf_tutor = isset($_POST['cpf']) ? trim($_POST['cpf']) : '';
+    $email_tutor = isset($_POST['email']) ? trim($_POST['email']) : '';
+    $telefone_tutor = isset($_POST['telefone']) ? trim($_POST['telefone']) : '';
+    $endereco_tutor = isset($_POST['endereco']) ? trim($_POST['endereco']) : '';
+
     // Validações
     if (empty($nome_tutor) || empty($cpf_tutor) || empty($telefone_tutor)) {
         $mensagem = "Nome, CPF e telefone são campos obrigatórios.";
@@ -43,10 +43,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $cpf_limpo = preg_replace('/[^0-9]/', '', $cpf_tutor);
         
         // Validar CPF
-        if (!validarCPF($cpf_limpo)) {
-            $mensagem = "CPF inválido. Por favor, verifique.";
-            $tipo_mensagem = "erro";
-        } else {
+       // if (!validarCPF($cpf_limpo)) {
+         //   $mensagem = "CPF inválido. Por favor, verifique.";
+         //  $tipo_mensagem = "erro";
+        // } else{
             // Verificar se o CPF já está cadastrado para outro tutor
             $sql = "SELECT id_tutor FROM Tutor WHERE cpf = ? AND id_tutor != ?";
             $stmt = $conn->prepare($sql);
@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
     }
-}
+//}
 
 // Função para validar CPF
 function validarCPF($cpf) {
@@ -231,27 +231,27 @@ $tutor = $result->fetch_assoc();
             <form action="editar_tutor.php?id=<?php echo $id_tutor; ?>" method="POST">
                 <div class="form-group">
                     <label for="nome_tutor">Nome do Tutor*</label>
-                    <input type="text" id="nome_tutor" name="nome_tutor" value="<?php echo htmlspecialchars($tutor['nome']); ?>" required />
+                    <input type="text" id="nome_tutor" name="nome" value="<?php echo htmlspecialchars($tutor['nome']); ?>" required />
                 </div>
                 
                 <div class="form-group">
                     <label for="cpf_tutor">CPF*</label>
-                    <input type="text" id="cpf_tutor" name="cpf_tutor" value="<?php echo htmlspecialchars($tutor['cpf']); ?>" required />
+                    <input type="text" id="cpf_tutor" name="cpf" value="<?php echo htmlspecialchars($tutor['cpf']); ?>" required />
                 </div>
                 
                 <div class="form-group">
                     <label for="telefone_tutor">Telefone*</label>
-                    <input type="text" id="telefone_tutor" name="telefone_tutor" value="<?php echo htmlspecialchars($tutor['telefone']); ?>" required />
+                    <input type="text" id="telefone_tutor" name="telefone" value="<?php echo htmlspecialchars($tutor['telefone']); ?>" required />
                 </div>
                 
                 <div class="form-group">
                     <label for="email_tutor">E-mail</label>
-                    <input type="email" id="email_tutor" name="email_tutor" value="<?php echo htmlspecialchars($tutor['email'] ?? ''); ?>" />
+                    <input type="email" id="email_tutor" name="email" value="<?php echo htmlspecialchars($tutor['email'] ?? ''); ?>" />
                 </div>
                 
                 <div class="form-group">
                     <label for="endereco_tutor">Endereço</label>
-                    <input type="text" id="endereco_tutor" name="endereco_tutor" value="<?php echo htmlspecialchars($tutor['endereco'] ?? ''); ?>" />
+                    <input type="text" id="endereco_tutor" name="endereco" value="<?php echo htmlspecialchars($tutor['endereco'] ?? ''); ?>" />
                 </div>
                 
                 <button type="submit" class="btn-primary">Atualizar Tutor</button>
