@@ -29,9 +29,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nome_pet = $_POST['nome_pet'];
     $especie = $_POST['especie'];
     $raca = $_POST['raca'];
-    $data_nascimento = (int)$_POST['idade'];
+    $data_nascimento = $_POST['data_nascimento']?? null;
     $sexo = $_POST['sexo'];
-    $observacoes = $_POST['descricao'];
+    $observacoes = $_POST['observacoes']?? null;
     
     // Validações
     if (empty($id_tutor) || empty($nome_pet) || empty($especie) || empty($sexo)) {
@@ -46,13 +46,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 // Atualiza os dados do pet
                 $sql = "UPDATE Pets SET id_tutor = ?, nome = ?, especie = ?, raca = ?, data_nascimento = ?, sexo = ?, observacoes = ? WHERE id_pet = ?";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("isssisdi", $id_tutor, $nome_pet, $especie, $raca, $data_nascimento, $sexo, $observacoes, $id_pet);
+                $stmt->bind_param("issssssi", $id_tutor, $nome_pet, $especie, $raca, $data_nascimento, $sexo, $observacoes, $id_pet);
                 $stmt->execute();
             } else {
                 // Insere um novo pet
                 $sql = "INSERT INTO Pets (id_tutor, nome, especie, raca, data_nascimento, sexo, observacoes) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("isssisd", $id_tutor, $nome_pet, $especie, $raca, $data_nascimento, $sexo, $observacoes);
+                $stmt->bind_param("issssss", $id_tutor, $nome_pet, $especie, $raca, $data_nascimento, $sexo, $observacoes);
                 $stmt->execute();
                 $id_pet = $conn->insert_id;
             }
@@ -107,6 +107,7 @@ if (isset($_GET['excluir']) && is_numeric($_GET['excluir'])) {
 
 // Busca todos os tutores para o dropdown
 $sql = "SELECT id_tutor, nome FROM Tutor ORDER BY nome";
+$sql = "SELECT * FROM Tutor";
 $result = $conn->query($sql);
 $tutores = [];
 
@@ -115,6 +116,7 @@ if ($result && $result->num_rows > 0) {
         $tutores[] = $row;
     }
 }
+
 
 // Busca todos os pets
 $sql = "SELECT p.*, t.nome as nome_tutor, t.telefone, t.endereco 
@@ -317,8 +319,9 @@ $conn->close();
             <?php endif; ?>
             
             <div class="tabs">
-                <div class="tab active" onclick="showTab('Pets')">Cadastro de Pets</div>
-                <div class="tab" onclick="showTab('tutores')">Cadastro de Tutores</div>
+               <div class="tab active" onclick="showTab('pets')">Cadastro de Pets</div> 
+               <div class="tab" onclick="showTab('tutores')">Cadastro de Tutores</div>
+                
             </div>
             
             <div id="tab-pets" class="tab-content active">
@@ -360,8 +363,8 @@ $conn->close();
                     </div>
                     
                     <div class="form-group">
-                        <label for="idade">Idade (anos)*</label>
-                        <input type="number" id="idade" name="idade" min="0" value="<?php echo $pet_edicao ? $pet_edicao['data_nascimento'] : (isset($_POST['data_nascimento']) ? $_POST['data_nascimento'] : ''); ?>" required />
+                        <label for="idade">Data de Nascimento</label>
+                        <input type="date" id="idade" name="data_nascimento" min="0" value="<?php echo $pet_edicao ? $pet_edicao['data_nascimento'] : (isset($_POST['data_nascimento']) ? $_POST['data_nascimento'] : ''); ?>" required />
                     </div>
                     
                     <div class="form-group">
@@ -375,7 +378,7 @@ $conn->close();
                     
                     <div class="form-group">
                         <label for="descricao">Descrição</label>
-                        <textarea id="descricao" name="descricao" rows="4"><?php echo $pet_edicao ? htmlspecialchars($pet_edicao['observacoes']) : (isset($_POST['observacoes']) ? htmlspecialchars($_POST['observacoes']) : ''); ?></textarea>
+                        <textarea id="descricao" name="observacoes" rows="4"><?php echo $pet_edicao ? htmlspecialchars($pet_edicao['observacoes']) : (isset($_POST['observacoes']) ? htmlspecialchars($_POST['observacoes']) : ''); ?></textarea>
                     </div>
                     
                     <button type="submit" class="btn-primary"><?php echo $pet_edicao ? 'Atualizar Pet' : 'Cadastrar Pet'; ?></button>
@@ -394,7 +397,7 @@ $conn->close();
                             <th>Nome</th>
                             <th>Espécie</th>
                             <th>Raça</th>
-                            <th>Idade</th>
+                            <th>Data de Nascimento</th>
                             <th>Tutor</th>
                             <th>Ações</th>
                         </tr>
@@ -411,7 +414,7 @@ $conn->close();
                                     <td><?php echo htmlspecialchars($pet['nome']); ?></td>
                                     <td><?php echo htmlspecialchars($pet['especie']); ?></td>
                                     <td><?php echo htmlspecialchars($pet['raca']); ?></td>
-                                    <td><?php echo htmlspecialchars($pet['data_nascimento']) . ' anos'; ?></td>
+                                    <td><?php echo $pet['data_nascimento'] ; ?></td>
                                     <td><?php echo htmlspecialchars($pet['nome_tutor']); ?></td>
                                     <td>
                                         <a href="cadastrar_pets.php?editar=<?php echo $pet['id_pet']; ?>" class="btn-action btn-edit">Editar</a>
@@ -429,27 +432,24 @@ $conn->close();
                 <form action="cadastrar_tutor.php" method="POST">
                     <div class="form-group">
                         <label for="nome_tutor">Nome do Tutor*</label>
-                        <input type="text" id="nome_tutor" name="nome_tutor" required />
+                        <input type="text" id="nome_tutor" name="nome" required />
                     </div>
                     
                     <div class="form-group">
                         <label for="cpf_tutor">CPF*</label>
-                        <input type="text" id="cpf_tutor" name="cpf_tutor" required />
+                        <input type="text" id="cpf_tutor" name="cpf" required />
                     </div>
-                    
+                          <div class="form-group">
+                        <label for="email_tutor">E-mail</label>
+                        <input type="email" id="email_tutor" name="email" required />
+                    </div>
                     <div class="form-group">
                         <label for="telefone_tutor">Telefone*</label>
-                        <input type="text" id="telefone_tutor" name="telefone_tutor" required />
+                        <input type="text" id="telefone_tutor" name="telefone" required />
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="email_tutor">E-mail</label>
-                        <input type="email" id="email_tutor" name="email_tutor" />
-                    </div>
-                    
                     <div class="form-group">
                         <label for="endereco_tutor">Endereço</label>
-                        <input type="text" id="endereco_tutor" name="endereco_tutor" />
+                        <input type="text" id="endereco_tutor" name="endereco" required />
                     </div>
                     
                     <button type="submit" class="btn-primary">Cadastrar Tutor</button>
@@ -462,6 +462,7 @@ $conn->close();
                         <tr>
                             <th>ID</th>
                             <th>Nome</th>
+                            <th>CPF</th>
                             <th>Telefone</th>
                             <th>Endereço</th>
                             <th>Ações</th>
@@ -477,8 +478,9 @@ $conn->close();
                                 <tr>
                                     <td><?php echo $tutor['id_tutor']; ?></td>
                                     <td><?php echo htmlspecialchars($tutor['nome']); ?></td>
-                                    <td><?php echo isset($tutor['telefone']) ? htmlspecialchars($tutor['telefone']) : '-'; ?></td>
-                                    <td><?php echo isset($tutor['endereco']) ? htmlspecialchars($tutor['endereco']) : '-'; ?></td>
+                                    <td><?php echo isset($tutor['cpf']) ? htmlspecialchars($tutor['cpf']) : ''; ?></td>
+                                    <td><?php echo isset($tutor['telefone']) ? htmlspecialchars($tutor['telefone']) : ''; ?></td>
+                                    <td><?php echo isset($tutor['endereco']) ? htmlspecialchars($tutor['endereco']) : ''; ?></td>
                                     <td>
                                         <a href="editar_tutor.php?id=<?php echo $tutor['id_tutor']; ?>" class="btn-action btn-edit">Editar</a>
                                         <a href="javascript:void(0);" onclick="confirmarExclusao(<?php echo $tutor['id_tutor']; ?>, 'tutor')" class="btn-action btn-delete">Excluir</a>
@@ -531,7 +533,7 @@ $conn->close();
         
         
         // Máscara para CPF
-        document.getElementById('cpf_tutor').addEventListener('input', function(e) {
+        document.getElementById('cpf').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
             if (value.length > 11) {
                 value = value.slice(0, 11);
@@ -549,7 +551,7 @@ $conn->close();
         });
         
         // Máscara para telefone
-        document.getElementById('telefone_tutor').addEventListener('input', function(e) {
+        document.getElementById('telefone').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
             if (value.length > 11) {
                 value = value.slice(0, 11);

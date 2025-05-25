@@ -23,7 +23,7 @@ $conn->begin_transaction();
 
 try {
     // Primeiro, verifica se existem pets associados a este tutor
-    $sql = "SELECT id_pet FROM Pet WHERE id_tutor = ?";
+    $sql = "SELECT id_pet FROM Pets WHERE id_tutor = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $id_tutor);
     $stmt->execute();
@@ -31,7 +31,7 @@ try {
     
     // Se existirem pets, exclui-os primeiro
     if ($result->num_rows > 0) {
-        $sql = "DELETE FROM Pet WHERE id_tutor = ?";
+        $sql = "DELETE FROM Pets WHERE id_tutor = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $id_tutor);
         $stmt->execute();
