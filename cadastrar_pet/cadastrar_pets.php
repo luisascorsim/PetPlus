@@ -29,9 +29,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nome_pet = $_POST['nome_pet'];
     $especie = $_POST['especie'];
     $raca = $_POST['raca'];
-    $idade = (int)$_POST['idade'];
+    $data_nascimento = (int)$_POST['idade'];
     $sexo = $_POST['sexo'];
-    $descricao = $_POST['descricao'];
+    $observacoes = $_POST['descricao'];
     
     // Validações
     if (empty($id_tutor) || empty($nome_pet) || empty($especie) || empty($sexo)) {
@@ -44,15 +44,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         try {
             if ($id_pet) {
                 // Atualiza os dados do pet
-                $sql = "UPDATE Pets SET id_tutor = ?, nome = ?, especie = ?, raca = ?, idade = ?, sexo = ?, descricao = ? WHERE id_pet = ?";
+                $sql = "UPDATE Pets SET id_tutor = ?, nome = ?, especie = ?, raca = ?, data_nascimento = ?, sexo = ?, observacoes = ? WHERE id_pet = ?";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("isssisdi", $id_tutor, $nome_pet, $especie, $raca, $idade, $sexo, $descricao, $id_pet);
+                $stmt->bind_param("isssisdi", $id_tutor, $nome_pet, $especie, $raca, $data_nascimento, $sexo, $observacoes, $id_pet);
                 $stmt->execute();
             } else {
                 // Insere um novo pet
-                $sql = "INSERT INTO Pet (id_tutor, nome, especie, raca, idade, sexo, descricao) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                $sql = "INSERT INTO Pets (id_tutor, nome, especie, raca, data_nascimento, sexo, observacoes) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("isssisd", $id_tutor, $nome_pet, $especie, $raca, $idade, $sexo, $descricao);
+                $stmt->bind_param("isssisd", $id_tutor, $nome_pet, $especie, $raca, $data_nascimento, $sexo, $observacoes);
                 $stmt->execute();
                 $id_pet = $conn->insert_id;
             }
@@ -86,7 +86,7 @@ if (isset($_GET['excluir']) && is_numeric($_GET['excluir'])) {
     
     try {
         // Exclui o pet
-        $sql = "DELETE FROM Pet WHERE id_pet = ?";
+        $sql = "DELETE FROM Pets WHERE id_pet = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $id_pet);
         $stmt->execute();
@@ -317,7 +317,7 @@ $conn->close();
             <?php endif; ?>
             
             <div class="tabs">
-                <div class="tab active" onclick="showTab('pets')">Cadastro de Pets</div>
+                <div class="tab active" onclick="showTab('Pets')">Cadastro de Pets</div>
                 <div class="tab" onclick="showTab('tutores')">Cadastro de Tutores</div>
             </div>
             
@@ -361,7 +361,7 @@ $conn->close();
                     
                     <div class="form-group">
                         <label for="idade">Idade (anos)*</label>
-                        <input type="number" id="idade" name="idade" min="0" value="<?php echo $pet_edicao ? $pet_edicao['idade'] : (isset($_POST['idade']) ? $_POST['idade'] : ''); ?>" required />
+                        <input type="number" id="idade" name="idade" min="0" value="<?php echo $pet_edicao ? $pet_edicao['data_nascimento'] : (isset($_POST['data_nascimento']) ? $_POST['data_nascimento'] : ''); ?>" required />
                     </div>
                     
                     <div class="form-group">
@@ -375,7 +375,7 @@ $conn->close();
                     
                     <div class="form-group">
                         <label for="descricao">Descrição</label>
-                        <textarea id="descricao" name="descricao" rows="4"><?php echo $pet_edicao ? htmlspecialchars($pet_edicao['descricao']) : (isset($_POST['descricao']) ? htmlspecialchars($_POST['descricao']) : ''); ?></textarea>
+                        <textarea id="descricao" name="descricao" rows="4"><?php echo $pet_edicao ? htmlspecialchars($pet_edicao['observacoes']) : (isset($_POST['observacoes']) ? htmlspecialchars($_POST['observacoes']) : ''); ?></textarea>
                     </div>
                     
                     <button type="submit" class="btn-primary"><?php echo $pet_edicao ? 'Atualizar Pet' : 'Cadastrar Pet'; ?></button>
@@ -411,7 +411,7 @@ $conn->close();
                                     <td><?php echo htmlspecialchars($pet['nome']); ?></td>
                                     <td><?php echo htmlspecialchars($pet['especie']); ?></td>
                                     <td><?php echo htmlspecialchars($pet['raca']); ?></td>
-                                    <td><?php echo $pet['idade'] . ' anos'; ?></td>
+                                    <td><?php echo htmlspecialchars($pet['data_nascimento']) . ' anos'; ?></td>
                                     <td><?php echo htmlspecialchars($pet['nome_tutor']); ?></td>
                                     <td>
                                         <a href="cadastrar_pets.php?editar=<?php echo $pet['id_pet']; ?>" class="btn-action btn-edit">Editar</a>

@@ -33,20 +33,20 @@ $tipo_mensagem = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Formulário de vacina
     $pet_id = $_POST['pet_id'];
-    $nome_vacina = $_POST['nome_vacina'];
-    $data_vacina = $_POST['data_vacina'];
+    $nome = $_POST['nome'];
+    $data_aplicacao = $_POST['data_vacina'];
     $lote = $_POST['lote'];
-    $reforco = $_POST['reforco'];
+    $data_proxima = $_POST['reforco'];
     
     // Validações
-    if (empty($pet_id) || empty($nome_vacina) || empty($data_vacina)) {
+    if (empty($pet_id) || empty($nome) || empty($data_aplicacao)) {
         $mensagem = "Todos os campos obrigatórios devem ser preenchidos.";
         $tipo_mensagem = "erro";
     } else {
         // Inserir na tabela vacinas
-        $sql = "INSERT INTO vacinas (pet_id, nome, data, lote, reforco) VALUES (?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO Vacinas (pet_id, nome, data_aplicacao, lote, data_proxima) VALUES (?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("issss", $pet_id, $nome_vacina, $data_vacina, $lote, $reforco);
+        $stmt->bind_param("issss", $pet_id, $nome, $data_aplicacao, $lote, $data_proxima);
         
         if ($stmt->execute()) {
             $mensagem = "Vacina registrada com sucesso!";
@@ -317,7 +317,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <td>${vacina.nome}</td>
                     <td>${formatarData(vacina.data)}</td>
                     <td>${vacina.lote || '-'}</td>
-                    <td>${vacina.reforco ? formatarData(vacina.reforco) : '-'}</td>
+                    <td>${vacina.reforco ? formatarData(vacina.data_proxima) : '-'}</td>
                     <td>
                         <button class="btn-danger" onclick="excluirVacina(${vacina.id})">Excluir</button>
                     </td>
