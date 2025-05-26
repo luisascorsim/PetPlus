@@ -10,13 +10,19 @@ CREATE TABLE IF NOT EXISTS Usuarios (
     cpf VARCHAR(14) UNIQUE,
     data_nasc DATE,
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    ultimo_acesso TIMESTAMP NULL
+    ultimo_acesso TIMESTAMP NULL,
+    tipo_usuario enum('administrador','veterinario','tutor') NOT NULL DEFAULT 'administrador'
 );
+
+INSERT INTO Usuarios (id_usuario, nome, email, senha, tipo_usuario) VALUES
+(1, 'Dra. Ana Silva', 'ana@clinica.com', 'senha123', 'veterinario'),
+(2, 'Dr. Carlos Souza', 'carlos@clinica.com', 'senha456', 'veterinario');
 
 -- Tabela de Tutores
 CREATE TABLE IF NOT EXISTS Tutor (
     id_tutor INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
+    cpf VARCHAR(14) UNIQUE,
     email VARCHAR(100),
     telefone VARCHAR(15),
     endereco VARCHAR(200),
@@ -48,15 +54,17 @@ CREATE TABLE IF NOT EXISTS consultas (
   tratamento text,
   observacoes text,
   veterinario_id int(11) DEFAULT NULL,
-  status enum('agendada','em_andamento','concluida','cancelada') NOT NULL DEFAULT 'agendada',
+  status_co enum('agendada','em_andamento','concluida','cancelada') NOT NULL DEFAULT 'agendada',
   created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   KEY pet_id (pet_id),
   KEY veterinario_id (veterinario_id),
-  CONSTRAINT consultas_ibfk_1 FOREIGN KEY (pet_id) REFERENCES Pet (id_pet) ON DELETE CASCADE,
+  CONSTRAINT consultas_ibfk_1 FOREIGN KEY (pet_id) REFERENCES Pets (id_pet) ON DELETE CASCADE,
   CONSTRAINT consultas_ibfk_2 FOREIGN KEY (veterinario_id) REFERENCES Usuarios (id_usuario) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+SELECT * FROM Usuarios WHERE id_usuario IN (1, 2);
 
 -- Tabela de Serviços
 CREATE TABLE IF NOT EXISTS Servicos (
@@ -65,17 +73,17 @@ CREATE TABLE IF NOT EXISTS Servicos (
     descricao TEXT,
     preco DECIMAL(10,2) NOT NULL,
     duracao INT,
-    status ENUM('ativo', 'inativo') DEFAULT 'ativo'
+    status_s ENUM('ativo', 'inativo') DEFAULT 'ativo'
 );
 
 -- Tabela de Consultas
-CREATE TABLE IF NOT EXISTS Consultas (
+CREATE TABLE IF NOT EXISTS Consultas_c (
     id INT AUTO_INCREMENT PRIMARY KEY,
     pet_id INT NOT NULL,
-    data DATETIME NOT NULL,
+    data_c DATETIME NOT NULL,
     descricao TEXT,
-    status ENUM('agendada', 'em andamento', 'concluída', 'cancelada') DEFAULT 'agendada',
-    FOREIGN KEY (pet_id) REFERENCES Pet(id_pet) ON DELETE CASCADE
+    status_c ENUM('agendada', 'em andamento', 'concluída', 'cancelada') DEFAULT 'agendada',
+    FOREIGN KEY (pet_id) REFERENCES Pets(id_pet) ON DELETE CASCADE
 );
 
 -- Tabela de Diagnósticos
@@ -98,7 +106,7 @@ CREATE TABLE IF NOT EXISTS Vacinas (
     data_proxima DATE,
     lote VARCHAR(50),
     observacoes TEXT,
-    FOREIGN KEY (pet_id) REFERENCES Pet(id_pet) ON DELETE CASCADE
+    FOREIGN KEY (pet_id) REFERENCES Pets(id_pet) ON DELETE CASCADE
 );
 
 -- Tabela de Controle de Peso
@@ -123,7 +131,7 @@ CREATE TABLE IF NOT EXISTS Faturas (
     observacoes TEXT,
     clinica VARCHAR(100) NOT NULL,
     profissional VARCHAR(100) NOT NULL,
-    status ENUM('pago', 'pendente', 'cancelado') DEFAULT 'pendente',
+    status_f ENUM('pago', 'pendente', 'cancelado') DEFAULT 'pendente',
     FOREIGN KEY (tutor_id) REFERENCES Tutor(id_tutor) ON DELETE CASCADE,
     FOREIGN KEY (pet_id) REFERENCES Pets(id_pet) ON DELETE CASCADE
 );
@@ -132,23 +140,26 @@ CREATE TABLE IF NOT EXISTS Faturas (
 CREATE TABLE IF NOT EXISTS Agendamentos (
     id_agendamento INT AUTO_INCREMENT PRIMARY KEY,
     id_pet INT,
+    id_tutor INT,
     id_servico INT,
     data_hora DATETIME NOT NULL,
-    status ENUM('agendado', 'concluido', 'cancelado') DEFAULT 'agendado',
+    status_a ENUM('agendado', 'concluido', 'cancelado') DEFAULT 'agendado',
     observacoes TEXT,
-    FOREIGN KEY (id_pet) REFERENCES Pet(id_pet) ON DELETE CASCADE,
+    FOREIGN KEY (id_pet) REFERENCES Pets(id_pet) ON DELETE CASCADE,
+    FOREIGN KEY (id_tutor) REFERENCES Tutor(id_tutor) ON DELETE CASCADE,
     FOREIGN KEY (id_servico) REFERENCES Servicos(id_servico) ON DELETE CASCADE
 );
+
 
 -- Inserir dados de exemplo para usuário administrador
 INSERT INTO Usuarios (nome, email, senha, cpf, data_nasc) VALUES
 ('Administrador', 'admin@petplus.com', '$2y$10$8MJO1GyYGrCZgD.OUgKqWOoC9Vc0HOTSsM7Vx5OzXIchcVrXIQS4m', '123.456.789-00', '1990-01-01');
 
 -- Inserir dados de exemplo para tutores
-INSERT INTO tutor (nome, email, telefone, endereco) VALUES
-('João Silva', 'joao@email.com', '(11) 98765-4321', 'Rua das Flores, 123'),
-('Maria Oliveira', 'maria@email.com', '(11) 91234-5678', 'Av. Principal, 456'),
-('Carlos Santos', 'carlos@email.com', '(11) 99876-5432', 'Rua do Comércio, 789');
+INSERT INTO Tutor (nome, email, cpf, telefone, endereco) VALUES
+('João Silva', 'joao@email.com', '66839867030','(11) 98765-4321', 'Rua das Flores, 123'),
+('Maria Oliveira', 'maria@email.com', '75390233093','(11) 91234-5678', 'Av. Principal, 456'),
+('Carlos Santos', 'carlos@email.com', '71257794094','(11) 99876-5432', 'Rua do Comércio, 789');
 
 -- Inserir dados de exemplo para pets
 INSERT INTO Pets (id_tutor, nome, especie, raca, data_nascimento, sexo, cor, peso) VALUES
@@ -158,7 +169,7 @@ INSERT INTO Pets (id_tutor, nome, especie, raca, data_nascimento, sexo, cor, pes
 (3, 'Thor', 'Cachorro', 'Bulldog', '2020-11-05', 'M', 'Branco e Marrom', 15.8);
 
 -- Inserir alguns dados de exemplo na tabela de consultas
-INSERT INTO consultas (pet_id, data_consulta, motivo, diagnostico, tratamento, observacoes, veterinario_id, status)
+INSERT INTO consultas (pet_id, data_consulta, motivo, diagnostico, tratamento, observacoes, veterinario_id, status_co)
 VALUES
 (1, '2023-06-15 10:00:00', 'Checkup anual', 'Pet saudável', 'Nenhum tratamento necessário', 'Continuar com a dieta atual', 1, 'concluida'),
 (2, '2023-06-16 14:30:00', 'Vacina anual', NULL, NULL, 'Trazer carteira de vacinação', 2, 'agendada'),
@@ -173,7 +184,7 @@ INSERT INTO Servicos (nome, descricao, preco, duracao) VALUES
 ('Exame de Sangue', 'Hemograma completo', 200.00, 20);
 
 -- Inserir dados de exemplo para consultas
-INSERT INTO Consultas (pet_id, data, descricao, status) VALUES
+INSERT INTO Consultas_c (pet_id, data_c, descricao, status_c) VALUES
 (1, '2023-06-15 10:00:00', 'Consulta de rotina', 'concluída'),
 (2, '2023-06-20 14:30:00', 'Verificação de alergia', 'concluída'),
 (3, '2023-07-05 09:00:00', 'Consulta pós-cirúrgica', 'agendada'),
@@ -198,13 +209,13 @@ INSERT INTO Peso (pet_id, peso, data_registro) VALUES
 (3, 28.0, '2023-04-22');
 
 -- Inserir dados de exemplo para faturas
-INSERT INTO Faturas (tutor_id, pet_id, data_fatura, servico, valor, forma_pagamento, clinica, profissional, status) VALUES
+INSERT INTO Faturas (tutor_id, pet_id, data_fatura, servico, valor, forma_pagamento, clinica, profissional, status_f) VALUES
 (1, 1, '2023-06-15', 'Consulta Veterinária', 150.00, 'Cartão de Crédito', 'PetPlus Clínica', 'Dr. Roberto Alves', 'pago'),
 (2, 3, '2023-06-20', 'Banho e Tosa', 80.00, 'Dinheiro', 'PetPlus Clínica', 'Ana Souza', 'pago'),
 (3, 4, '2023-07-05', 'Vacinação', 120.00, 'Pix', 'PetPlus Clínica', 'Dra. Carla Mendes', 'pendente');
 
 -- Inserir dados de exemplo para agendamentos
-INSERT INTO Agendamentos (id_pet, id_servico, data_hora, status) VALUES
+INSERT INTO Agendamentos (id_pet, id_servico, data_hora, status_a) VALUES
 (1, 1, '2023-07-15 10:00:00', 'agendado'),
 (2, 2, '2023-07-16 14:30:00', 'agendado'),
 (3, 3, '2023-07-17 09:00:00', 'agendado');
