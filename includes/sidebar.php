@@ -79,7 +79,7 @@ function isActive($pagina) {
         
         <div class="menu-category">
             <h3 class="category-title">Financeiro</h3>
-            <a href="<?php echo $caminhoBase; ?>fatura_detalhada/fatura-detalhada.php" class="menu-item <?php echo isActive('fatura_detalhada/fatura-detalhada.php'); ?>">
+            <a href="<?php echo $caminhoBase; ?>fatura_detalhada/gerenciamento_faturas.php" class="menu-item <?php echo isActive('fatura_detalhada/fatura-detalhada.php'); ?>">
                 <i class="fas fa-file-invoice-dollar"></i>
                 <span>Faturas</span>
             </a>

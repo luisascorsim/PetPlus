@@ -6,19 +6,15 @@ if (session_status() == PHP_SESSION_NONE) {
 
 // Verificar se o usuário está logado
 if (!isset($_SESSION['id_usuario']) && !isset($_SESSION['usuario_id'])) {
-    // Para desenvolvimento, criar uma sessão temporária
     $_SESSION['usuario_id'] = 1;
    
 }
 
-// Define o caminho base para os recursos
 $caminhoBase = '../';
 
-// Inclui o header e sidebar
 require_once('../includes/header.php');
 require_once('../includes/sidebar.php');
 
-// Conexão com o banco de dados
 require_once('../conecta_db.php');
 $conn = conecta_db();
 
@@ -640,14 +636,7 @@ if ($result && $result->num_rows > 0) {
     
     // Manipula o envio do formulário
     document.getElementById('formAgendamento').addEventListener('submit', function(e) {
-        //e.preventDefault();
-        
-        // Aqui você implementaria a lógica para salvar o agendamento
-        //alert('Agendamento salvo com sucesso!');
-        //fecharModalAgendamento();
-        
-        // Em um sistema real, você recarregaria a página ou atualizaria a visualização
-        //window.location.reload();
+
     });
     
     // Fecha o modal se o usuário clicar fora dele
