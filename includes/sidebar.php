@@ -71,7 +71,7 @@ function isActive($pagina) {
                 <i class="fas fa-clipboard-list"></i>
                 <span>Agenda</span>
             </a>
-            <a href="<?php echo $caminhoBase; ?>vacinas_e_controle_do_peso/vacinas-peso.php" class="menu-item <?php echo isActive('vacinas_e_controle_do_peso/vacinas-peso.php'); ?>">
+            <a href="<?php echo $caminhoBase; ?>vacinas/vacinas.php" class="menu-item <?php echo isActive('vacinas_e_controle_do_peso/vacinas-peso.php'); ?>">
                 <i class="fas fa-syringe"></i>
                 <span>Vacinas</span>
             </a>
