@@ -162,6 +162,18 @@ CREATE TABLE IF NOT EXISTS Agendamentos (
 
 SELECT * FROM Agendamentos;
 
+CREATE TABLE IF NOT EXISTS Prontuarios (
+    id_prontuario INT AUTO_INCREMENT PRIMARY KEY,
+    consulta_id INT NOT NULL,
+    pet_id INT NOT NULL,
+    data DATETIME NOT NULL COMMENT 'Data e hora do registro no prontuário',
+    descricao TEXT NOT NULL COMMENT 'Descrição detalhada do registro no prontuário',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (consulta_id) REFERENCES consultas(id) ON DELETE CASCADE,
+    FOREIGN KEY (pet_id) REFERENCES Pets(id_pet) ON DELETE CASCADE
+);
+
 -- Inserir dados de exemplo para usuário administrador
 INSERT INTO Usuarios (nome, email, senha, cpf, data_nasc) VALUES
 ('Administrador', 'admin@petplus.com', '$2y$10$8MJO1GyYGrCZgD.OUgKqWOoC9Vc0HOTSsM7Vx5OzXIchcVrXIQS4m', '123.456.789-00', '1990-01-01');
