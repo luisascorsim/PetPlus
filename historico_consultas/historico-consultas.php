@@ -104,7 +104,7 @@ $consultas = [];
 try {
     $sql = "SELECT c.*, p.nome as pet_nome, t.nome as tutor_nome 
             FROM Consultas c
-            JOIN Pet p ON c.pet_id = p.id_pet
+            JOIN Pets p ON c.pet_id = p.id_pet
             JOIN Tutor t ON p.id_tutor = t.id_tutor
             ORDER BY c.data DESC";
     $result = $conn->query($sql);
@@ -124,7 +124,7 @@ $prontuarios = [];
 try {
     $sql = "SELECT pr.*, p.nome as pet_nome, t.nome as tutor_nome 
             FROM prontuarios pr
-            JOIN Pet p ON pr.pet_id = p.id_pet
+            JOIN Pets p ON pr.pet_id = p.id_pet
             JOIN Tutor t ON p.id_tutor = t.id_tutor
             ORDER BY pr.data DESC";
     $result = $conn->query($sql);
