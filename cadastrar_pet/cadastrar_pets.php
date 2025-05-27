@@ -44,16 +44,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         try {
             if ($id_pet) {
                 // Atualiza os dados do pet
-                $sql = "UPDATE Pets SET id_tutor = ?, nome = ?, especie = ?, raca = ?, idade = ?, sexo = ?, descricao = ? WHERE id_pet = ?";
+                $sql = "UPDATE Pets SET id_tutor = ?, nome = ?, especie = ?, raca = ?, data_nascimento = ?, sexo = ?, observacoes = ? WHERE id_pet = ?";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("issssssi", $id_tutor, $nome_pet, $especie, $raca, $data_nascimento, $sexo, $observacoes, $id_pet);
                 $stmt->execute();
             } else {
                 // Insere um novo pet
-                $sql = "INSERT INTO Pet (id_tutor, nome, especie, raca, idade, sexo, descricao) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                // SQL com 6 placeholders
+                $sql = "INSERT INTO Pets (id_tutor, nome, especie, raca, data_nascimento, sexo, observacoes) VALUES (?, ?, ?, ?, ?, ?)";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("issssss", $id_tutor, $nome_pet, $especie, $raca, $data_nascimento, $sexo, $observacoes);
-                $stmt->execute();
+                // bind_param com 6 variáveis e 6 tipos
+                $stmt->bind_param("issssss", $id_tutor, $nome_pet, $especie, $raca, $data_nascimento, $sexo, $observacoes);                $stmt->execute();
                 $id_pet = $conn->insert_id;
             }
             
@@ -86,7 +87,7 @@ if (isset($_GET['excluir']) && is_numeric($_GET['excluir'])) {
     
     try {
         // Exclui o pet
-        $sql = "DELETE FROM Pet WHERE id_pet = ?";
+        $sql = "DELETE FROM Pets WHERE id_pet = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $id_pet);
         $stmt->execute();
@@ -377,7 +378,7 @@ $conn->close();
                     </div>
                     
                     <div class="form-group">
-                        <label for="descricao">Descrição</label>
+                        <label for="observacoes">Descrição</label>
                         <textarea id="descricao" name="observacoes" rows="4"><?php echo $pet_edicao ? htmlspecialchars($pet_edicao['observacoes']) : (isset($_POST['observacoes']) ? htmlspecialchars($_POST['observacoes']) : ''); ?></textarea>
                     </div>
                     
