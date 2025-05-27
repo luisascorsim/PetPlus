@@ -83,8 +83,6 @@ try {
         exit;
     }
 
-    // --- PREPARAÇÃO DE DADOS PARA VISUALIZAÇÃO ---
-
     // Se a ação for editar, busca os dados do registro para preencher o formulário
     if ($action === 'edit' && $teste_id) {
         $stmt = $oMysql->prepare("SELECT teste_id, descricao FROM tb_teste WHERE teste_id = ?");
