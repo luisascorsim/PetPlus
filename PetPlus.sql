@@ -161,7 +161,7 @@ CREATE TABLE IF NOT EXISTS Agendamentos (
 );
 
 SELECT * FROM Agendamentos;
-
+-- Tabela de prontuarios
 CREATE TABLE IF NOT EXISTS Prontuarios (
     id_prontuario INT AUTO_INCREMENT PRIMARY KEY,
     consulta_id INT NOT NULL,
@@ -172,6 +172,21 @@ CREATE TABLE IF NOT EXISTS Prontuarios (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (consulta_id) REFERENCES consultas(id) ON DELETE CASCADE,
     FOREIGN KEY (pet_id) REFERENCES Pets(id_pet) ON DELETE CASCADE
+);
+
+-- Tabela de Notificacoes
+-- Tabela de Notificacoes
+CREATE TABLE IF NOT EXISTS Notificacoes (
+    id_notificacao INT AUTO_INCREMENT PRIMARY KEY,
+    remetente_id_usuario INT NOT NULL COMMENT 'ID do usuário que ENVIOU a notificação',
+    id_usuario INT NOT NULL COMMENT 'ID do usuário que RECEBERÁ a notificação (destinatário)',
+    titulo VARCHAR(255) NOT NULL,
+    mensagem TEXT NOT NULL,
+    lida TINYINT(1) NOT NULL DEFAULT 0 COMMENT '0 = não lida, 1 = lida (pelo destinatário)',
+    data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+    data_visualizacao DATETIME DEFAULT NULL,
+    FOREIGN KEY (remetente_id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE CASCADE
 );
 
 -- Inserir dados de exemplo para usuário administrador
