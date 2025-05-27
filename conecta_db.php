@@ -7,7 +7,7 @@
 function conecta_db() {
     $db_name = "petPlus";
     $user = "root";
-    $pass = "";
+    $pass = "PUC@1234";
     $server = "localhost";
     
     $conexao = new mysqli($server, $user, $pass, $db_name);

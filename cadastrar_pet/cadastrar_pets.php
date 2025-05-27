@@ -373,8 +373,8 @@ $conn->close();
                         <label for="sexo">Sexo*</label>
                         <select id="sexo" name="sexo" required>
                             <option value="">Selecione</option>
-                            <option value="Macho" <?php echo ($pet_edicao && $pet_edicao['sexo'] == 'Macho') || (isset($_POST['sexo']) && $_POST['sexo'] == 'Macho') ? 'selected' : ''; ?>>Macho</option>
-                            <option value="Fêmea" <?php echo ($pet_edicao && $pet_edicao['sexo'] == 'Fêmea') || (isset($_POST['sexo']) && $_POST['sexo'] == 'Fêmea') ? 'selected' : ''; ?>>Fêmea</option>
+                            <option value="M" <?php echo ($pet_edicao && $pet_edicao['sexo'] == 'M') || (isset($_POST['sexo']) && $_POST['sexo'] == 'M') ? 'selected' : ''; ?>>Macho</option>
+                            <option value="F" <?php echo ($pet_edicao && $pet_edicao['sexo'] == 'F') || (isset($_POST['sexo']) && $_POST['sexo'] == 'F') ? 'selected' : ''; ?>>Fêmea</option>
                         </select>
                     </div>
                     
