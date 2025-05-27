@@ -128,6 +128,48 @@ $stmt->close();
 
 // O array $agendamentos agora contém dados do banco para a semana atual
 // A simulação $agendamentos = [ ... ]; deve ser removida ou comentada.
+if (isset($_GET['excluir']) && is_numeric($_GET['excluir'])) {
+    $id_agendamento = (int)$_GET['excluir'];
+
+    $conn->begin_transaction(); // Inicia uma transação
+
+    try {
+        // CORREÇÃO: Usar a tabela 'Agendamentos' (no plural)
+        $sql = "DELETE FROM Agendamentos WHERE id_agendamento = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $id_agendamento);
+
+        if (!$stmt->execute()) {
+            throw new Exception("Falha ao executar a exclusão: " . $stmt->error);
+        }
+
+        $conn->commit(); // Confirma a transação
+
+        $_SESSION['mensagem'] = "Agendamento excluído com sucesso!"; // Armazena em sessão
+        $_SESSION['tipo_mensagem'] = "sucesso";
+        } catch (Exception $e) {
+            $conn->rollback(); // Reverte a transação em caso de erro
+
+            $_SESSION['mensagem'] = "Erro ao excluir agendamento: " . $e->getMessage(); // Armazena em sessão
+            $_SESSION['tipo_mensagem'] = "erro";
+        }
+        // Redireciona para evitar re-submissão e exibir mensagem
+        //header("Location: agenda.php"); 
+        //exit();
+}
+
+// Busca todos os tutores para o dropdown
+$sql = "SELECT id_tutor, nome FROM Tutor ORDER BY nome";
+$result = $conn->query($sql);
+$tutores = [];
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $tutores[] = $row;
+    }
+}
+
+
 ?>
 
 <div class="container">
@@ -177,6 +219,12 @@ $stmt->close();
                             echo '<strong>' . $agendamento['tutor'] . '</strong><br>';
                             echo 'Pet: ' . $agendamento['pet'] . '<br>';
                             echo $agendamento['servico'];
+                            
+                            echo '<div class="botoes-agendamento">';
+                            echo '<button class="btn-alterar" onclick="abrirModalEdicao(' . $agendamento['id'] . ')">Alterar</button>';
+                            echo '<button class="btn-excluir" onclick="excluirAgendamento(' . $agendamento['id'] . ')">Excluir</button>';
+                            echo '</div>';
+
                             echo '</div>';
                         }
                         
@@ -211,11 +259,9 @@ $stmt->close();
             <div class="form-group">
                 <label for="tutor">Cliente:</label>
                 <select id="cliente" name="id_tutor" required>
-                    <option value="">Selecione um cliente</option>
-                    <option value="1">Maria Silva</option>
-                    <option value="2">João Pereira</option>
-                    <option value="3">Ana Costa</option>
-                    <option value="4">Carlos Oliveira</option>
+                    <?php foreach ($tutores as $tutor): ?>
+                        <option value="<?= $tutor['id_tutor'] ?>"><?= htmlspecialchars($tutor['nome']) ?></option>
+                    <?php endforeach; ?>
                 </select>
             </div>
             <div class="form-group">
@@ -476,6 +522,30 @@ $stmt->close();
             margin: 10% auto;
         }
     }
+    .botoes-agendamento {
+    margin-top: 5px;
+    display: flex;
+    gap: 5px;
+    }
+
+    .btn-alterar, .btn-excluir {
+        padding: 4px 6px;
+        font-size: 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .btn-alterar {
+        background-color: #f0ad4e;
+        color: white;
+    }
+
+    .btn-excluir {
+        background-color: #d9534f;
+        color: white;
+    }
+
 </style>
 
 <script>
@@ -532,6 +602,40 @@ $stmt->close();
                 petSelect.appendChild(option);
             });
         }
+    });
+
+    function abrirModalEdicao(id) {
+    // Aqui você pode carregar os dados via AJAX ou passar via PHP
+    alert("Abrir modal para editar agendamento com ID: " + id);
+    // Você pode preencher o modal com os dados do agendamento e mostrar
+    }
+
+    function excluirAgendamento(id) {
+    if (confirm("Deseja realmente excluir este agendamento?")) {
+        window.location.href = "agenda.php?excluir=" + id;
+    }
+}
+
+    document.getElementById("cliente").addEventListener("change", function() {
+    const idTutor = this.value;
+    const petSelect = document.getElementById("pet");
+
+    petSelect.innerHTML = '<option>Carregando...</option>';
+
+    fetch("get_pets.php?id_tutor=" + idTutor)
+        .then(response => response.json())
+        .then(data => {
+            petSelect.innerHTML = '<option value="">Selecione um pet</option>';
+            data.forEach(pet => {
+                const option = document.createElement("option");
+                option.value = pet.id_pet;
+                option.textContent = pet.nome;
+                petSelect.appendChild(option);
+            });
+        })
+        .catch(() => {
+            petSelect.innerHTML = '<option>Erro ao carregar</option>';
+            });
     });
     
     // Manipula o envio do formulário

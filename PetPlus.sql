@@ -1,6 +1,9 @@
 CREATE DATABASE IF NOT EXISTS petplus;
 USE petplus;
 
+DROP DATABASE petplus;
+DROP table Consultas;
+
 -- Tabela de Usuários
 CREATE TABLE IF NOT EXISTS Usuarios (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
@@ -28,6 +31,8 @@ CREATE TABLE IF NOT EXISTS Tutor (
     endereco VARCHAR(200),
     data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+SELECT * FROM Tutor;
 
 -- Tabela de Pets
 CREATE TABLE IF NOT EXISTS Pets (
@@ -67,14 +72,19 @@ CREATE TABLE IF NOT EXISTS consultas (
 SELECT * FROM Usuarios WHERE id_usuario IN (1, 2);
 
 -- Tabela de Serviços
-CREATE TABLE IF NOT EXISTS Servicos (
+CREATE TABLE Servicos (
     id_servico INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
+    nome VARCHAR(255) NOT NULL,
     descricao TEXT,
-    preco DECIMAL(10,2) NOT NULL,
-    duracao INT,
-    status_s ENUM('ativo', 'inativo') DEFAULT 'ativo'
+    preco DECIMAL(10, 2) NOT NULL,
+    duracao INT NOT NULL COMMENT 'Duração em minutos',
+    categoria VARCHAR(100) NOT NULL, -- Nova coluna para a categoria
+    status_s VARCHAR(50) DEFAULT 'ativo', -- 'ativo' ou 'inativo'
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+SELECT * FROM Servicos;
 
 -- Tabela de Consultas
 CREATE TABLE IF NOT EXISTS Consultas_c (
@@ -150,6 +160,7 @@ CREATE TABLE IF NOT EXISTS Agendamentos (
     FOREIGN KEY (id_servico) REFERENCES Servicos(id_servico) ON DELETE CASCADE
 );
 
+SELECT * FROM Agendamentos;
 
 -- Inserir dados de exemplo para usuário administrador
 INSERT INTO Usuarios (nome, email, senha, cpf, data_nasc) VALUES

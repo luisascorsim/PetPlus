@@ -17,109 +17,175 @@ require_once('../includes/sidebar.php');
 require_once('../conecta_db.php');
 $conn = conecta_db();
 
-// Simulação de dados de serviços (em um sistema real, viria do banco de dados)
-$servicos = [
-    [
-        'id' => 1,
-        'nome' => 'Consulta de Rotina',
-        'descricao' => 'Avaliação geral da saúde do animal, incluindo exame físico completo.',
-        'duracao' => 30,
-        'preco' => 120.00,
-        'categoria' => 'Consulta'
-    ],
-    [
-        'id' => 2,
-        'nome' => 'Vacinação',
-        'descricao' => 'Aplicação de vacinas de acordo com o calendário vacinal do animal.',
-        'duracao' => 15,
-        'preco' => 80.00,
-        'categoria' => 'Prevenção'
-    ],
-    [
-        'id' => 3,
-        'nome' => 'Banho e Tosa',
-        'descricao' => 'Higienização completa do animal, incluindo banho, secagem, escovação e corte de pelos.',
-        'duracao' => 90,
-        'preco' => 70.00,
-        'categoria' => 'Estética'
-    ],
-    [
-        'id' => 4,
-        'nome' => 'Exames Laboratoriais',
-        'descricao' => 'Coleta e análise de amostras para diagnóstico de doenças e avaliação da saúde.',
-        'duracao' => 20,
-        'preco' => 150.00,
-        'categoria' => 'Diagnóstico'
-    ],
-    [
-        'id' => 5,
-        'nome' => 'Cirurgia de Castração',
-        'descricao' => 'Procedimento cirúrgico para esterilização do animal.',
-        'duracao' => 60,
-        'preco' => 350.00,
-        'categoria' => 'Cirurgia'
-    ],
-    [
-        'id' => 6,
-        'nome' => 'Tratamento Dentário',
-        'descricao' => 'Limpeza, remoção de tártaro e tratamento de problemas dentários.',
-        'duracao' => 45,
-        'preco' => 200.00,
-        'categoria' => 'Odontologia'
-    ]
+$mensagem = '';
+$tipo_mensagem = '';
+
+// --- Definir categorias estáticas aqui ---
+// Você pode adicionar, remover ou editar as categorias conforme necessário.
+$categoriasEstaticas = [
+    'Prevenção',
+    'Estética',
+    'Diagnóstico',
+    'Cirurgia',
+    'Odontologia',
 ];
+sort($categoriasEstaticas); // Opcional: ordenar categorias alfabeticamente
 
-// Filtragem de serviços por categoria
-$categorias = array_unique(array_column($servicos, 'categoria'));
-$categoriaFiltro = isset($_GET['categoria']) ? $_GET['categoria'] : '';
+// Lógica para Salvar/Atualizar Serviço (POST)
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['form_action']) && $_POST['form_action'] == 'save_service') {
+    $id_servico = isset($_POST['servico_id']) && !empty($_POST['servico_id']) ? (int)$_POST['servico_id'] : null;
 
+    $nome = trim($_POST['nome']); // Usar trim para remover espaços em branco
+    $descricao = trim($_POST['descricao']);
+    $preco = filter_var($_POST['preco'], FILTER_VALIDATE_FLOAT); // Valida e converte para float
+    $duracao = filter_var($_POST['duracao'], FILTER_VALIDATE_INT); // Valida e converte para int
+
+    // Determina a categoria: se for 'nova', usa o valor de novaCategoria, senão, usa a categoria selecionada
+    $categoria = $_POST['categoria'] === 'nova' ? trim($_POST['novaCategoria']) : trim($_POST['categoria']);
+    $status_s = 'ativo'; // Definido como 'ativo'
+
+    // Validações
+    if (empty($nome) || empty($descricao) || $preco === false || $preco === null || $duracao === false || $duracao === null || empty($categoria)) {
+        $mensagem = "Todos os campos obrigatórios devem ser preenchidos corretamente.";
+        $tipo_mensagem = "erro";
+    } else {
+        $conn->begin_transaction();
+        try {
+            if ($id_servico) {
+                // Atualiza os dados do serviço
+                $sql = "UPDATE Servicos SET nome=?, descricao=?, preco=?, duracao=?, categoria=?, status_s=? WHERE id_servico=?";
+                $stmt = $conn->prepare($sql);
+                // Tipos: ssdissi (string, string, double, integer, string, string para status_s, integer para id_servico)
+                $stmt->bind_param("ssdissi", $nome, $descricao, $preco, $duracao, $categoria, $status_s, $id_servico);
+            } else {
+                // Insere um novo serviço
+                $sql = "INSERT INTO Servicos (nome, descricao, preco, duracao, categoria, status_s) VALUES (?, ?, ?, ?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+                // Tipos: ssdiss (string, string, double, integer, string, string)
+                $stmt->bind_param("ssdiss", $nome, $descricao, $preco, $duracao, $categoria, $status_s);
+            }
+
+            if (!$stmt->execute()) {
+                throw new Exception("Erro ao executar a declaração: " . $stmt->error);
+            }
+            $conn->commit();
+
+            $mensagem = $id_servico ? "Serviço atualizado com sucesso!" : "Serviço cadastrado com sucesso!";
+            $tipo_mensagem = "sucesso";
+
+            // Limpa os dados do formulário após um cadastro bem-sucedido
+            if (!$id_servico) {
+                $_POST = array(); // Limpa os campos POST para evitar reenvio
+            }
+        } catch (Exception $e) {
+            $conn->rollback();
+            $mensagem = "Erro ao " . ($id_servico ? "atualizar" : "cadastrar") . " serviço: " . $e->getMessage();
+            $tipo_mensagem = "erro";
+        }
+    }
+}
+
+// Lógica para Excluir Serviço (POST)
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['form_action']) && $_POST['form_action'] == 'delete_service' && isset($_POST['id_excluir']) && is_numeric($_POST['id_excluir'])) {
+    $id_servico = (int)$_POST['id_excluir'];
+    $conn->begin_transaction();
+    try {
+        $sql = "DELETE FROM Servicos WHERE id_servico = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $id_servico);
+        if (!$stmt->execute()) {
+            throw new Exception("Erro ao executar a declaração de exclusão: " . $stmt->error);
+        }
+        $conn->commit();
+        $mensagem = "Serviço excluído com sucesso!";
+        $tipo_mensagem = "sucesso";
+    } catch (Exception $e) {
+        $conn->rollback();
+        $mensagem = "Erro ao excluir serviço: " . $e->getMessage();
+        $tipo_mensagem = "erro";
+    }
+}
+
+
+// --- Lógica de Carregamento e Filtro de Serviços (GET) ---
+
+// Busca todos os serviços para exibir
+$servicos = [];
+// CORREÇÃO AQUI: Adicionado 'categoria' à consulta SELECT
+$sql = "SELECT id_servico, nome, descricao, preco, duracao, categoria, status_s FROM Servicos ORDER BY nome";
+$result = $conn->query($sql);
+
+if ($result) {
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $servicos[] = $row;
+        }
+    }
+} else {
+    error_log("Erro ao buscar serviços: " . $conn->error);
+    $mensagem = "Erro ao carregar serviços do banco de dados.";
+    $tipo_mensagem = "erro";
+}
+
+// O array $categorias agora será $categoriasEstaticas para o filtro e select
+$categoriasParaFiltroEFormulario = $categoriasEstaticas;
+
+// Filtros
+$categoriaFiltro = $_GET['categoria'] ?? '';
+$termoBusca = $_GET['busca'] ?? '';
+
+// Aplicar filtro de categoria (ainda filtra pelos dados do banco)
 if (!empty($categoriaFiltro)) {
-    $servicos = array_filter($servicos, function($servico) use ($categoriaFiltro) {
-        return $servico['categoria'] === $categoriaFiltro;
-    });
+    // Filtra os serviços já carregados em PHP
+    $servicos = array_filter($servicos, fn($s) => isset($s['categoria']) && $s['categoria'] === $categoriaFiltro);
+}
+// Aplicar filtro de busca
+if (!empty($termoBusca)) {
+    // Filtra os serviços já carregados em PHP
+    $servicos = array_filter($servicos, fn($s) =>
+        stripos($s['nome'], $termoBusca) !== false || stripos($s['descricao'], $termoBusca) !== false
+    );
 }
 
-// Busca por nome
-$termoBusca = isset($_GET['busca']) ? $_GET['busca'] : '';
-if (!empty($termoBusca)) {
-    $servicos = array_filter($servicos, function($servico) use ($termoBusca) {
-        return (
-            stripos($servico['nome'], $termoBusca) !== false ||
-            stripos($servico['descricao'], $termoBusca) !== false
-        );
-    });
-}
+// Fecha a conexão com o banco de dados
+$conn->close();
 ?>
 
 <div class="container">
+    <?php if (!empty($mensagem)): ?>
+        <div class="alerta alerta-<?php echo $tipo_mensagem; ?>">
+            <?php echo htmlspecialchars($mensagem); ?>
+        </div>
+    <?php endif; ?>
+
     <div class="card">
         <div class="header-card">
             <h1>Serviços</h1>
             <button class="btn-novo" onclick="abrirModalServico()">Novo Serviço</button>
         </div>
-        
+
         <div class="filtro-container">
             <div class="categorias-filtro">
                 <a href="servicos.php" class="categoria-item <?php echo empty($categoriaFiltro) ? 'ativo' : ''; ?>">Todos</a>
-                <?php foreach ($categorias as $categoria): ?>
+                <?php foreach ($categoriasEstaticas as $categoria): // Usa as categorias estáticas para o filtro ?>
                     <a href="?categoria=<?php echo urlencode($categoria); ?>" class="categoria-item <?php echo $categoriaFiltro === $categoria ? 'ativo' : ''; ?>">
                         <?php echo htmlspecialchars($categoria); ?>
                     </a>
                 <?php endforeach; ?>
             </div>
-            
+
             <form action="" method="GET" class="form-busca">
                 <?php if (!empty($categoriaFiltro)): ?>
                     <input type="hidden" name="categoria" value="<?php echo htmlspecialchars($categoriaFiltro); ?>">
                 <?php endif; ?>
                 <input type="text" name="busca" placeholder="Buscar serviços..." value="<?php echo htmlspecialchars($termoBusca); ?>">
                 <button type="submit" class="btn-buscar">Buscar</button>
-                <?php if (!empty($termoBusca)): ?>
-                    <a href="<?php echo empty($categoriaFiltro) ? 'servicos.php' : '?categoria=' . urlencode($categoriaFiltro); ?>" class="btn-limpar">Limpar</a>
+                <?php if (!empty($termoBusca) || !empty($categoriaFiltro)): ?>
+                    <a href="servicos.php" class="btn-limpar">Limpar</a>
                 <?php endif; ?>
             </form>
         </div>
-        
+
         <div class="servicos-grid">
             <?php if (empty($servicos)): ?>
                 <div class="mensagem-vazia">
@@ -128,16 +194,16 @@ if (!empty($termoBusca)) {
             <?php else: ?>
                 <?php foreach ($servicos as $servico): ?>
                     <div class="servico-card">
-                        <div class="servico-categoria"><?php echo htmlspecialchars($servico['categoria']); ?></div>
+                        <div class="servico-categoria"><?php echo isset($servico['categoria']) ? htmlspecialchars($servico['categoria']) : 'N/A'; ?></div>
                         <h3><?php echo htmlspecialchars($servico['nome']); ?></h3>
                         <p class="servico-descricao"><?php echo htmlspecialchars($servico['descricao']); ?></p>
                         <div class="servico-detalhes">
-                            <span><strong>Duração:</strong> <?php echo $servico['duracao']; ?> min</span>
+                            <span><strong>Duração:</strong> <?php echo htmlspecialchars($servico['duracao']); ?> min</span>
                             <span><strong>Preço:</strong> R$ <?php echo number_format($servico['preco'], 2, ',', '.'); ?></span>
                         </div>
                         <div class="servico-acoes">
-                            <button class="btn-editar" onclick="abrirModalServico(<?php echo $servico['id']; ?>)">Editar</button>
-                            <button class="btn-excluir" onclick="confirmarExclusao(<?php echo $servico['id']; ?>)">Excluir</button>
+                            <button class="btn-editar" onclick="abrirModalServico(<?php echo htmlspecialchars($servico['id_servico']); ?>)">Editar</button>
+                            <button class="btn-excluir" onclick="confirmarExclusao(<?php echo htmlspecialchars($servico['id_servico']); ?>)">Excluir</button>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -146,50 +212,50 @@ if (!empty($termoBusca)) {
     </div>
 </div>
 
-<!-- Modal de Serviço -->
 <div id="modalServico" class="modal">
     <div class="modal-content">
         <span class="fechar" onclick="fecharModalServico()">&times;</span>
         <h2 id="tituloModal">Novo Serviço</h2>
-        <form id="formServico">
+        <form id="formServico" action="servicos.php" method="POST">
+            <input type="hidden" name="form_action" value="save_service">
             <input type="hidden" id="servico_id" name="servico_id" value="">
-            
+
             <div class="form-group">
                 <label for="nome">Nome do Serviço:</label>
                 <input type="text" id="nome" name="nome" required>
             </div>
-            
+
             <div class="form-group">
                 <label for="categoria">Categoria:</label>
                 <select id="categoria" name="categoria" required>
                     <option value="">Selecione</option>
-                    <?php foreach ($categorias as $categoria): ?>
+                    <?php foreach ($categoriasEstaticas as $categoria): // Usa as categorias estáticas no select do formulário ?>
                         <option value="<?php echo htmlspecialchars($categoria); ?>"><?php echo htmlspecialchars($categoria); ?></option>
                     <?php endforeach; ?>
                     <option value="nova">Nova Categoria...</option>
                 </select>
             </div>
-            
+
             <div id="novaCategoriaGroup" class="form-group" style="display: none;">
                 <label for="novaCategoria">Nova Categoria:</label>
                 <input type="text" id="novaCategoria" name="novaCategoria">
             </div>
-            
+
             <div class="form-group">
                 <label for="descricao">Descrição:</label>
                 <textarea id="descricao" name="descricao" rows="3" required></textarea>
             </div>
-            
+
             <div class="form-group">
                 <label for="duracao">Duração (minutos):</label>
                 <input type="number" id="duracao" name="duracao" min="1" required>
             </div>
-            
+
             <div class="form-group">
                 <label for="preco">Preço (R$):</label>
                 <input type="number" id="preco" name="preco" min="0" step="0.01" required>
             </div>
-            
+
             <div class="form-actions">
                 <button type="button" class="btn-cancelar" onclick="fecharModalServico()">Cancelar</button>
                 <button type="submit" class="btn-salvar">Salvar</button>
@@ -198,7 +264,6 @@ if (!empty($termoBusca)) {
     </div>
 </div>
 
-<!-- Modal de Confirmação de Exclusão -->
 <div id="modalConfirmacao" class="modal">
     <div class="modal-content modal-confirmacao">
         <h2>Confirmar Exclusão</h2>
@@ -508,99 +573,148 @@ if (!empty($termoBusca)) {
 <script>
     // Variável para armazenar o ID do serviço a ser excluído
     let servicoParaExcluir = null;
-    
+
     // Função para abrir o modal de serviço
     function abrirModalServico(servicoId = null) {
         const modal = document.getElementById('modalServico');
         const tituloModal = document.getElementById('tituloModal');
         const form = document.getElementById('formServico');
-        
+
         modal.style.display = 'block';
-        
+
         if (servicoId) {
             tituloModal.textContent = 'Editar Serviço';
             document.getElementById('servico_id').value = servicoId;
-            
-            // Simulação de preenchimento do formulário com dados do serviço
-            // Em um sistema real, você buscaria os dados do serviço no banco de dados
-            const servico = <?php echo json_encode($servicos); ?>.find(s => s.id === servicoId);
-            
+
+            // Busca os dados do serviço na lista de serviços que o PHP já disponibilizou
+            const servicosData = <?php echo json_encode($servicos); ?>;
+            const servico = servicosData.find(s => s.id_servico == servicoId);
+
             if (servico) {
                 document.getElementById('nome').value = servico.nome;
-                document.getElementById('categoria').value = servico.categoria;
                 document.getElementById('descricao').value = servico.descricao;
                 document.getElementById('duracao').value = servico.duracao;
                 document.getElementById('preco').value = servico.preco;
+
+                // Preencher a categoria
+                const categoriaSelect = document.getElementById('categoria');
+                let categoriaEncontradaNaListaEstatica = false;
+
+                // Percorre as categorias estáticas para ver se a categoria do serviço existe na lista
+                // Adicionado verificação `if (servico.categoria)` para evitar erro se 'categoria' estiver faltando
+                // embora com a correção SQL, não deva mais faltar.
+                if (servico.categoria) {
+                    <?php foreach ($categoriasEstaticas as $cat): ?>
+                        if (servico.categoria === '<?php echo htmlspecialchars($cat); ?>') {
+                            categoriaSelect.value = servico.categoria;
+                            categoriaEncontradaNaListaEstatica = true;
+                        }
+                    <?php endforeach; ?>
+                }
+
+
+                // Se a categoria do serviço não estiver nas categorias estáticas,
+                // selecionar 'nova' e preencher o campo 'novaCategoria'.
+                if (!categoriaEncontradaNaListaEstatica && servico.categoria) {
+                    categoriaSelect.value = 'nova';
+                    document.getElementById('novaCategoriaGroup').style.display = 'block';
+                    document.getElementById('novaCategoria').value = servico.categoria;
+                    document.getElementById('novaCategoria').setAttribute('required', 'required');
+                } else {
+                    document.getElementById('novaCategoriaGroup').style.display = 'none';
+                    document.getElementById('novaCategoria').value = '';
+                    document.getElementById('novaCategoria').removeAttribute('required');
+                }
+
+            } else {
+                console.error("Serviço com ID " + servicoId + " não encontrado na lista.");
+                fecharModalServico();
             }
         } else {
+            // Lógica para Novo Serviço
             tituloModal.textContent = 'Novo Serviço';
             form.reset();
+            document.getElementById('servico_id').value = '';
+            document.getElementById('novaCategoriaGroup').style.display = 'none';
+            document.getElementById('novaCategoria').value = '';
+            document.getElementById('novaCategoria').removeAttribute('required');
+            document.getElementById('categoria').value = ''; // Garante que o select de categoria esteja "Selecione"
         }
     }
-    
+
     // Função para fechar o modal de serviço
     function fecharModalServico() {
         const modal = document.getElementById('modalServico');
         modal.style.display = 'none';
+        document.getElementById('formServico').reset();
+        document.getElementById('servico_id').value = '';
+        document.getElementById('novaCategoriaGroup').style.display = 'none';
+        document.getElementById('novaCategoria').value = '';
+        document.getElementById('novaCategoria').removeAttribute('required');
+        document.getElementById('categoria').value = ''; // Garante que o select de categoria esteja "Selecione"
     }
-    
+
     // Função para abrir o modal de confirmação de exclusão
     function confirmarExclusao(servicoId) {
         servicoParaExcluir = servicoId;
         const modal = document.getElementById('modalConfirmacao');
         modal.style.display = 'block';
     }
-    
+
     // Função para fechar o modal de confirmação
     function fecharModalConfirmacao() {
         const modal = document.getElementById('modalConfirmacao');
         modal.style.display = 'none';
         servicoParaExcluir = null;
     }
-    
+
     // Função para excluir o serviço
     function excluirServico() {
         if (servicoParaExcluir) {
-            // Aqui você implementaria a lógica para excluir o serviço
-            alert('Serviço excluído com sucesso!');
-            fecharModalConfirmacao();
-            
-            // Em um sistema real, você recarregaria a página ou atualizaria a visualização
-            // window.location.reload();
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'servicos.php';
+
+            const inputId = document.createElement('input');
+            inputId.type = 'hidden';
+            inputId.name = 'id_excluir';
+            inputId.value = servicoParaExcluir;
+            form.appendChild(inputId);
+
+            const inputAction = document.createElement('input');
+            inputAction.type = 'hidden';
+            inputAction.name = 'form_action';
+            inputAction.value = 'delete_service';
+            form.appendChild(inputAction);
+
+            document.body.appendChild(form);
+            form.submit();
         }
     }
-    
+
     // Mostrar campo de nova categoria quando "Nova Categoria" for selecionada
     document.getElementById('categoria').addEventListener('change', function() {
         const novaCategoriaGroup = document.getElementById('novaCategoriaGroup');
+        const novaCategoriaInput = document.getElementById('novaCategoria');
         if (this.value === 'nova') {
             novaCategoriaGroup.style.display = 'block';
+            novaCategoriaInput.setAttribute('required', 'required');
         } else {
             novaCategoriaGroup.style.display = 'none';
+            novaCategoriaInput.removeAttribute('required');
+            novaCategoriaInput.value = '';
         }
     });
-    
-    // Manipula o envio do formulário
-    document.getElementById('formServico').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Aqui você implementaria a lógica para salvar o serviço
-        alert('Serviço salvo com sucesso!');
-        fecharModalServico();
-        
-        // Em um sistema real, você recarregaria a página ou atualizaria a visualização
-        // window.location.reload();
-    });
-    
+
     // Fecha os modais se o usuário clicar fora deles
     window.addEventListener('click', function(event) {
         const modalServico = document.getElementById('modalServico');
         const modalConfirmacao = document.getElementById('modalConfirmacao');
-        
+
         if (event.target == modalServico) {
             fecharModalServico();
         }
-        
+
         if (event.target == modalConfirmacao) {
             fecharModalConfirmacao();
         }
