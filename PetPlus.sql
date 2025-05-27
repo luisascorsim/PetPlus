@@ -38,9 +38,8 @@ CREATE TABLE IF NOT EXISTS Pets (
     raca VARCHAR(50),
     data_nascimento DATE,
     sexo ENUM('M', 'F'),
-    cor VARCHAR(50),
     peso DECIMAL(5,2),
-    observacoes TEXT,
+    observacoes CHAR,
     FOREIGN KEY (id_tutor) REFERENCES Tutor(id_tutor) ON DELETE CASCADE
 );
 
@@ -150,6 +149,18 @@ CREATE TABLE IF NOT EXISTS Agendamentos (
     FOREIGN KEY (id_servico) REFERENCES Servicos(id_servico) ON DELETE CASCADE
 );
 
+-- Tabela de Prontuarios
+CREATE TABLE IF NOT EXISTS Prontuarios (
+    id_prontuario INT AUTO_INCREMENT PRIMARY KEY,
+    consulta_id INT NOT NULL,
+    pet_id INT NOT NULL,
+    data DATETIME NOT NULL COMMENT 'Data e hora do registro no prontuário',
+    descricao TEXT NOT NULL COMMENT 'Descrição detalhada do registro no prontuário',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (consulta_id) REFERENCES consultas(id) ON DELETE CASCADE,
+    FOREIGN KEY (pet_id) REFERENCES Pets(id_pet) ON DELETE CASCADE
+);
 
 -- Inserir dados de exemplo para usuário administrador
 INSERT INTO Usuarios (nome, email, senha, cpf, data_nasc) VALUES
