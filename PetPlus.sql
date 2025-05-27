@@ -72,16 +72,14 @@ CREATE TABLE IF NOT EXISTS consultas (
 SELECT * FROM Usuarios WHERE id_usuario IN (1, 2);
 
 -- Tabela de Serviços
-CREATE TABLE Servicos (
+CREATE TABLE IF NOT EXISTS Servicos (
     id_servico INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(255) NOT NULL,
+    nome VARCHAR(100) NOT NULL,
     descricao TEXT,
-    preco DECIMAL(10, 2) NOT NULL,
-    duracao INT NOT NULL COMMENT 'Duração em minutos',
-    categoria VARCHAR(100) NOT NULL, -- Nova coluna para a categoria
-    status_s VARCHAR(50) DEFAULT 'ativo', -- 'ativo' ou 'inativo'
-    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    preco DECIMAL(10,2) NOT NULL,
+    duracao INT,
+    categoria VARCHAR(100) NOT NULL,
+    status_s ENUM('ativo', 'inativo') DEFAULT 'ativo'
 );
 
 SELECT * FROM Servicos;
