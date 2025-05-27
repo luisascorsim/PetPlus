@@ -8,9 +8,7 @@ if (session_status() == PHP_SESSION_NONE) {
 if (!isset($_SESSION['id_usuario']) && !isset($_SESSION['usuario_id'])) {
     // Para desenvolvimento, criar uma sessão temporária
     $_SESSION['usuario_id'] = 1;
-    $_SESSION['usuario_nome'] = '';
-    $_SESSION['usuario_email'] = '';
-    $_SESSION['usuario_tipo'] = '';
+   
 }
 
 // Define o caminho base para os recursos
@@ -24,6 +22,33 @@ require_once('../includes/sidebar.php');
 require_once('../conecta_db.php');
 $conn = conecta_db();
 
+
+$mensagem = '';
+$tipo_mensagem = '';
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $data = $_POST['data'];
+    $hora = $_POST['hora'];
+    $data_hora = $data . ' ' . $hora;
+
+    $id_pet = $_POST['id_pet'];
+    $id_tutor = $_POST['id_tutor'];
+    $id_servico = $_POST['id_servico'];
+    $status_a = 'agendado'; // ou $_POST['status_a'] se vier do form
+    $observacoes = $_POST['observacoes'];
+
+    $stmt = $conn->prepare("INSERT INTO Agendamentos (id_pet, id_tutor, id_servico, data_hora, status_a, observacoes) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("iiisss", $id_pet, $id_tutor, $id_servico, $data_hora, $status_a, $observacoes);
+
+    if ($stmt->execute()) {
+        $mensagem = "Agendamento realizado com sucesso!";
+        $tipo_mensagem = "sucesso";
+    } else {
+        $mensagem = "Erro ao agendar: " . $stmt->error;
+        $tipo_mensagem = "erro";
+    }
+    $stmt->close();
+}
 // Obtém a data atual e calcula o início e fim da semana
 $dataAtual = isset($_GET['data']) ? new DateTime($_GET['data']) : new DateTime();
 $inicioSemana = clone $dataAtual;
@@ -56,37 +81,53 @@ $horarios = [
     '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'
 ];
 
-// Consulta para buscar os agendamentos da semana
-$dataInicio = $inicioSemana->format('Y-m-d');
-$dataFim = $fimSemana->format('Y-m-d');
+// ... (código de processamento do POST para inserir agendamento) ...
 
-// Simulação de dados de agendamentos (em um sistema real, viria do banco de dados)
-$agendamentos = [
-    [
-        'id' => 1,
-        'data' => '2025-05-02',
-        'hora' => '09:00',
-        'cliente' => 'Maria Silva',
-        'pet' => 'Rex',
-        'servico' => 'Consulta de Rotina'
-    ],
-    [
-        'id' => 2,
-        'data' => '2025-05-02',
-        'hora' => '14:30',
-        'cliente' => 'João Pereira',
-        'pet' => 'Luna',
-        'servico' => 'Vacinação'
-    ],
-    [
-        'id' => 3,
-        'data' => '2025-05-03',
-        'hora' => '10:00',
-        'cliente' => 'Ana Costa',
-        'pet' => 'Mel',
-        'servico' => 'Banho e Tosa'
-    ]
-];
+// Consulta para buscar os agendamentos da semana DO BANCO DE DADOS
+$dataInicioFormatada = $inicioSemana->format('Y-m-d');
+$dataFimFormatada = $fimSemana->format('Y-m-d');
+
+$sqlAgendamentos = "SELECT 
+                        A.id_agendamento as id, 
+                        A.data_hora, 
+                        T.nome as tutor, 
+                        P.nome as pet, 
+                        S.nome as servico
+                    FROM 
+                        Agendamentos A
+                    LEFT JOIN 
+                        Tutor T ON A.id_tutor = T.id_tutor
+                    LEFT JOIN 
+                        Pets P ON A.id_pet = P.id_pet
+                    LEFT JOIN 
+                        Servicos S ON A.id_servico = S.id_servico
+                    WHERE 
+                        DATE(A.data_hora) BETWEEN ? AND ?";
+
+$stmt = $conn->prepare($sqlAgendamentos);
+$stmt->bind_param("ss", $dataInicioFormatada, $dataFimFormatada);
+$stmt->execute();
+$resultAgendamentos = $stmt->get_result();
+
+$agendamentos = [];
+if ($resultAgendamentos->num_rows > 0) {
+    while ($row = $resultAgendamentos->fetch_assoc()) {
+        // Separar data e hora se 'data_hora' for DATETIME
+        $dateTime = new DateTime($row['data_hora']);
+        $agendamentos[] = [
+            'id' => $row['id'],
+            'data' => $dateTime->format('Y-m-d'),
+            'hora' => $dateTime->format('H:i'),
+            'tutor' => $row['tutor'],       // agora nome do tutor
+            'pet' => $row['pet'],           // agora nome do pet
+            'servico' => $row['servico']    // agora nome do serviço
+        ];
+    }
+}
+$stmt->close();
+
+// O array $agendamentos agora contém dados do banco para a semana atual
+// A simulação $agendamentos = [ ... ]; deve ser removida ou comentada.
 ?>
 
 <div class="container">
@@ -133,7 +174,7 @@ $agendamentos = [
                         
                         foreach ($agendamentosHorario as $agendamento) {
                             echo '<div class="agendamento">';
-                            echo '<strong>' . $agendamento['cliente'] . '</strong><br>';
+                            echo '<strong>' . $agendamento['tutor'] . '</strong><br>';
                             echo 'Pet: ' . $agendamento['pet'] . '<br>';
                             echo $agendamento['servico'];
                             echo '</div>';
@@ -154,22 +195,22 @@ $agendamentos = [
     <div class="modal-content">
         <span class="fechar" onclick="fecharModalAgendamento()">&times;</span>
         <h2>Novo Agendamento</h2>
-        <form id="formAgendamento">
+            <form id="formAgendamento" method="POST" action="">
+                <div class="form-group">
+            <label for="data">Data:</label>
+            <input type="date" id="data" name="data" required>
+        </div>
+        <div class="form-group">
+            <label for="hora">Horário:</label>
+            <select id="hora" name="hora" required>
+                <?php foreach ($horarios as $h): ?>
+                    <option value="<?php echo $h; ?>"><?php echo $h; ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
             <div class="form-group">
-                <label for="data">Data:</label>
-                <input type="date" id="data" name="data" required>
-            </div>
-            <div class="form-group">
-                <label for="hora">Horário:</label>
-                <select id="hora" name="hora" required>
-                    <?php foreach ($horarios as $h): ?>
-                        <option value="<?php echo $h; ?>"><?php echo $h; ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="cliente">Cliente:</label>
-                <select id="cliente" name="cliente" required>
+                <label for="tutor">Cliente:</label>
+                <select id="cliente" name="id_tutor" required>
                     <option value="">Selecione um cliente</option>
                     <option value="1">Maria Silva</option>
                     <option value="2">João Pereira</option>
@@ -179,14 +220,14 @@ $agendamentos = [
             </div>
             <div class="form-group">
                 <label for="pet">Pet:</label>
-                <select id="pet" name="pet" required>
+                <select id="pet" name="id_pet" required>
                     <option value="">Selecione um pet</option>
                     <!-- Será preenchido via JavaScript quando o cliente for selecionado -->
                 </select>
             </div>
             <div class="form-group">
                 <label for="servico">Serviço:</label>
-                <select id="servico" name="servico" required>
+                <select id="servico" name="id_servico" required>
                     <option value="">Selecione um serviço</option>
                     <option value="1">Consulta de Rotina</option>
                     <option value="2">Vacinação</option>
@@ -467,11 +508,7 @@ $agendamentos = [
         ],
         '3': [
             { id: 4, nome: 'Mel (Golden Retriever)' },
-            { id: 5, nome: 'Bob ( v )'}
-        ],
-        '3': [
-            { id: 4, nome: 'Mel (Golden Retriever)' },
-            { id: 5, nome: 'Bob (Bulldog)' }
+            { id: 5, nome: 'Bob (Bulldog)' } // Corrigido
         ],
         '4': [
             { id: 6, nome: 'Thor (Pastor Alemão)' }
@@ -499,14 +536,14 @@ $agendamentos = [
     
     // Manipula o envio do formulário
     document.getElementById('formAgendamento').addEventListener('submit', function(e) {
-        e.preventDefault();
+        //e.preventDefault();
         
         // Aqui você implementaria a lógica para salvar o agendamento
-        alert('Agendamento salvo com sucesso!');
-        fecharModalAgendamento();
+        //alert('Agendamento salvo com sucesso!');
+        //fecharModalAgendamento();
         
         // Em um sistema real, você recarregaria a página ou atualizaria a visualização
-        // window.location.reload();
+        //window.location.reload();
     });
     
     // Fecha o modal se o usuário clicar fora dele

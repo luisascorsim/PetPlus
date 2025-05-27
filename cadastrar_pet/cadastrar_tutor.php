@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Inserir novo tutor
     $sql = "INSERT INTO Tutor (nome, cpf, email, telefone,  endereco) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssss", $nome_tutor, $cpf_limpo, $email_tutor, $telefone_tutor, $endereco_tutor);
+    $stmt->bind_param("sssss", $nome_tutor, $cpf_tutor, $email_tutor, $telefone_tutor, $endereco_tutor);
                 
     if ($stmt->execute()) {
     $mensagem = "Tutor cadastrado com sucesso!";
