@@ -1,9 +1,6 @@
 CREATE DATABASE IF NOT EXISTS petplus;
 USE petplus;
 
-DROP DATABASE petplus;
-DROP table Consultas;
-
 -- Tabela de Usuários
 CREATE TABLE IF NOT EXISTS Usuarios (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
