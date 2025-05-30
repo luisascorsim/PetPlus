@@ -1,6 +1,6 @@
 <?php
 require_once '../includes/header.php';
-require_once '../api/conexao.php';
+require_once('../conecta_db.php');
 
 // Verificar se o usuário está logado
 session_start();

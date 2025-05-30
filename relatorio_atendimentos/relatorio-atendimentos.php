@@ -1,5 +1,5 @@
 <?php
-require_once '../config/database.php';
+require_once('../conecta_db.php');
 session_start();
 
 // Verificar se o usuário está logado

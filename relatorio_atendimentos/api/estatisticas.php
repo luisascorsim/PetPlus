@@ -1,6 +1,6 @@
 <?php
 // Este arquivo seria usado para fornecer dados para os gráficos
-require_once '../../config/database.php';
+require_once('../conecta_db.php');
 
 // Verificar se o usuário está logado
 session_start();

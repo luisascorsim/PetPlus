@@ -9,7 +9,7 @@ if (!isset($_SESSION['usuario_id'])) {
 }
 
 // Incluir arquivo de conexão com o banco de dados
-require_once '../../config/database.php';
+require_once('../conecta_db.php');
 
 // Parâmetros de paginação e filtro
 $pagina = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;

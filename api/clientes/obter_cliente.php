@@ -1,6 +1,6 @@
 <?php
 // Incluir arquivo de conexão
-require_once '../conexao.php';
+require_once '../conecta_db.php';
 
 // Verificar se o ID foi fornecido
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;

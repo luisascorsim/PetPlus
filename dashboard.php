@@ -7,7 +7,7 @@ if (!isset($_SESSION['usuario_id'])) {
     exit;
 }
 
-require_once 'config/database.php';
+require_once('../conecta_db.php');
 
 // Obter informações do usuário
 $usuario_id = $_SESSION['usuario_id'];

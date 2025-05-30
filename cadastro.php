@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Incluir arquivo de conexão com o banco de dados
-require_once 'config/database.php';
+require_once('../conecta_db.php');
 
 // Obter dados do formulário
 $nome = isset($_POST['nome']) ? trim($_POST['nome']) : '';
