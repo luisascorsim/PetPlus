@@ -8,7 +8,6 @@ if (session_status() == PHP_SESSION_NONE) {
 if (!isset($_SESSION['id_usuario']) && !isset($_SESSION['usuario_id'])) {
     // Para desenvolvimento, criar uma sessão temporária
     $_SESSION['usuario_id'] = 1;
-   
 }
 
 // Define o caminho base para os recursos
@@ -22,9 +21,17 @@ require_once('../includes/sidebar.php');
 require_once('../conecta_db.php');
 $conn = conecta_db();
 
-
+// --- Lógica de Mensagens da Sessão ---
 $mensagem = '';
 $tipo_mensagem = '';
+
+if (isset($_SESSION['mensagem'])) {
+    $mensagem = $_SESSION['mensagem'];
+    $tipo_mensagem = $_SESSION['tipo_mensagem'];
+    unset($_SESSION['mensagem']); // Limpa a mensagem da sessão
+    unset($_SESSION['tipo_mensagem']); // Limpa o tipo da mensagem da sessão
+}
+// --- Fim Lógica de Mensagens da Sessão ---
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $data = $_POST['data'];
@@ -34,21 +41,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $id_pet = $_POST['id_pet'];
     $id_tutor = $_POST['id_tutor'];
     $id_servico = $_POST['id_servico'];
-    $status_a = 'agendado'; // ou $_POST['status_a'] se vier do form
+    $status_a = 'agendado'; 
     $observacoes = $_POST['observacoes'];
 
     $stmt = $conn->prepare("INSERT INTO Agendamentos (id_pet, id_tutor, id_servico, data_hora, status_a, observacoes) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("iiisss", $id_pet, $id_tutor, $id_servico, $data_hora, $status_a, $observacoes);
 
     if ($stmt->execute()) {
-        $mensagem = "Agendamento realizado com sucesso!";
-        $tipo_mensagem = "sucesso";
+        $_SESSION['mensagem'] = "Agendamento realizado com sucesso!";
+        $_SESSION['tipo_mensagem'] = "sucesso";
     } else {
-        $mensagem = "Erro ao agendar: " . $stmt->error;
-        $tipo_mensagem = "erro";
+        $_SESSION['mensagem'] = "Erro ao agendar: " . $stmt->error;
+        $_SESSION['tipo_mensagem'] = "erro"; 
+        header("Location: agenda.php"); // Redireciona após POST para evitar reenvio
+    exit();
     }
+   
     $stmt->close();
+
 }
+
 // Obtém a data atual e calcula o início e fim da semana
 $dataAtual = isset($_GET['data']) ? new DateTime($_GET['data']) : new DateTime();
 $inicioSemana = clone $dataAtual;
@@ -81,7 +93,6 @@ $horarios = [
     '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'
 ];
 
-// ... (código de processamento do POST para inserir agendamento) ...
 
 // Consulta para buscar os agendamentos da semana DO BANCO DE DADOS
 $dataInicioFormatada = $inicioSemana->format('Y-m-d');
@@ -112,30 +123,27 @@ $resultAgendamentos = $stmt->get_result();
 $agendamentos = [];
 if ($resultAgendamentos->num_rows > 0) {
     while ($row = $resultAgendamentos->fetch_assoc()) {
-        // Separar data e hora se 'data_hora' for DATETIME
         $dateTime = new DateTime($row['data_hora']);
         $agendamentos[] = [
             'id' => $row['id'],
             'data' => $dateTime->format('Y-m-d'),
             'hora' => $dateTime->format('H:i'),
-            'tutor' => $row['tutor'],       // agora nome do tutor
-            'pet' => $row['pet'],           // agora nome do pet
-            'servico' => $row['servico']    // agora nome do serviço
+            'tutor' => $row['tutor'],
+            'pet' => $row['pet'],
+            'servico' => $row['servico']
         ];
     }
 }
 $stmt->close();
 
-// O array $agendamentos agora contém dados do banco para a semana atual
-// A simulação $agendamentos = [ ... ]; deve ser removida ou comentada.
+// Lógica de Exclusão
 if (isset($_GET['excluir']) && is_numeric($_GET['excluir'])) {
     $id_agendamento = (int)$_GET['excluir'];
 
-    $conn->begin_transaction(); // Inicia uma transação
+    $conn->begin_transaction(); 
 
     try {
-        // CORREÇÃO: Usar a tabela 'Agendamentos' (no plural)
-        $sql = "DELETE FROM Agendamentos WHERE id_agendamento = ?";
+        $sql = "DELETE FROM Agendamentos WHERE id_agendamento = ?"; // CORREÇÃO: Tabela "Agendamentos"
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $id_agendamento);
 
@@ -143,36 +151,51 @@ if (isset($_GET['excluir']) && is_numeric($_GET['excluir'])) {
             throw new Exception("Falha ao executar a exclusão: " . $stmt->error);
         }
 
-        $conn->commit(); // Confirma a transação
+        $conn->commit(); 
 
-        $_SESSION['mensagem'] = "Agendamento excluído com sucesso!"; // Armazena em sessão
-        $_SESSION['tipo_mensagem'] = "sucesso";
+            $_SESSION['mensagem'] = "Agendamento excluído com sucesso!"; 
+            $_SESSION['tipo_mensagem'] = "sucesso";
         } catch (Exception $e) {
-            $conn->rollback(); // Reverte a transação em caso de erro
-
-            $_SESSION['mensagem'] = "Erro ao excluir agendamento: " . $e->getMessage(); // Armazena em sessão
+            $conn->rollback(); 
+            $_SESSION['mensagem'] = "Erro ao excluir agendamento: " . $e->getMessage();
             $_SESSION['tipo_mensagem'] = "erro";
-        }
-        // Redireciona para evitar re-submissão e exibir mensagem
-        //header("Location: agenda.php"); 
-        //exit();
+
+            header("Location: agenda.php"); // Redireciona após a exclusão
+        exit();
+    }
+    
 }
 
 // Busca todos os tutores para o dropdown
-$sql = "SELECT id_tutor, nome FROM Tutor ORDER BY nome";
-$result = $conn->query($sql);
+$sqlTutores = "SELECT id_tutor, nome FROM Tutor ORDER BY nome";
+$resultTutores = $conn->query($sqlTutores);
 $tutores = [];
 
-if ($result && $result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
+if ($resultTutores && $resultTutores->num_rows > 0) {
+    while ($row = $resultTutores->fetch_assoc()) {
         $tutores[] = $row;
     }
 }
 
+// Busca todos os serviços para o dropdown
+$sqlServicos = "SELECT id_servico, nome FROM Servicos ORDER BY nome";
+$resultServicos = $conn->query($sqlServicos);
+$servicos = [];
+
+if ($resultServicos && $resultServicos->num_rows > 0) {
+    while ($row = $resultServicos->fetch_assoc()) {
+        $servicos[] = $row;
+    }
+}
 
 ?>
-
 <div class="container">
+    <?php if (!empty($mensagem)): // Bloco para exibir mensagens ?>
+        <div class="alerta <?php echo $tipo_mensagem; ?>">
+            <?php echo htmlspecialchars($mensagem); ?>
+        </div>
+    <?php endif; ?>
+
     <div class="card">
         <div class="header-card">
             <h1>Agenda</h1>
@@ -216,9 +239,9 @@ if ($result && $result->num_rows > 0) {
                         
                         foreach ($agendamentosHorario as $agendamento) {
                             echo '<div class="agendamento">';
-                            echo '<strong>' . $agendamento['tutor'] . '</strong><br>';
-                            echo 'Pet: ' . $agendamento['pet'] . '<br>';
-                            echo $agendamento['servico'];
+                            echo '<strong>' . htmlspecialchars($agendamento['tutor']) . '</strong><br>';
+                            echo 'Pet: ' . htmlspecialchars($agendamento['pet']) . '<br>';
+                            echo htmlspecialchars($agendamento['servico']);
                             
                             echo '<div class="botoes-agendamento">';
                             echo '<button class="btn-alterar" onclick="abrirModalEdicao(' . $agendamento['id'] . ')">Alterar</button>';
@@ -238,48 +261,44 @@ if ($result && $result->num_rows > 0) {
     </div>
 </div>
 
-<!-- Modal de Agendamento -->
 <div id="modalAgendamento" class="modal">
     <div class="modal-content">
         <span class="fechar" onclick="fecharModalAgendamento()">&times;</span>
         <h2>Novo Agendamento</h2>
-            <form id="formAgendamento" method="POST" action="">
-                <div class="form-group">
-            <label for="data">Data:</label>
-            <input type="date" id="data" name="data" required>
-        </div>
-        <div class="form-group">
-            <label for="hora">Horário:</label>
-            <select id="hora" name="hora" required>
-                <?php foreach ($horarios as $h): ?>
-                    <option value="<?php echo $h; ?>"><?php echo $h; ?></option>
-                <?php endforeach; ?>
-            </select>
-        </div>
+        <form id="formAgendamento" method="POST" action="">
             <div class="form-group">
-                <label for="tutor">Cliente:</label>
-                <select id="cliente" name="id_tutor" required>
-                    <?php foreach ($tutores as $tutor): ?>
-                        <option value="<?= $tutor['id_tutor'] ?>"><?= htmlspecialchars($tutor['nome']) ?></option>
+                <label for="data">Data:</label>
+                <input type="date" id="data" name="data" required>
+            </div>
+            <div class="form-group">
+                <label for="hora">Horário:</label>
+                <select id="hora" name="hora" required>
+                    <?php foreach ($horarios as $h): ?>
+                        <option value="<?php echo $h; ?>"><?php echo $h; ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
             <div class="form-group">
-                <label for="pet">Pet:</label>
-                <select id="pet" name="id_pet" required>
-                    <option value="">Selecione um pet</option>
-                    <!-- Será preenchido via JavaScript quando o cliente for selecionado -->
+                <label for="cliente">Cliente:</label>
+                <select id="cliente" name="id_tutor" required>
+                    <option value="">Selecione um cliente</option> <?php foreach ($tutores as $tutor): ?>
+                        <option value="<?= htmlspecialchars($tutor['id_tutor']) ?>"><?= htmlspecialchars($tutor['nome']) ?></option>
+                    <?php endforeach; ?>
                 </select>
+            </div>
+            <div class="form-group">
+                <label for="id_pet">Pet:</label>
+                <select id="id_pet" name="id_pet" required>
+                    <option value="">Selecione um pet</option>
+                    </select>
             </div>
             <div class="form-group">
                 <label for="servico">Serviço:</label>
                 <select id="servico" name="id_servico" required>
                     <option value="">Selecione um serviço</option>
-                    <option value="1">Consulta de Rotina</option>
-                    <option value="2">Vacinação</option>
-                    <option value="3">Banho e Tosa</option>
-                    <option value="4">Exames Laboratoriais</option>
-                    <option value="5">Cirurgia</option>
+                    <?php foreach ($servicos as $servico): ?>
+                        <option value="<?= htmlspecialchars($servico['id_servico']) ?>"><?= htmlspecialchars($servico['nome']) ?></option>
+                    <?php endforeach; ?>
                 </select>
             </div>
             <div class="form-group">
@@ -558,6 +577,12 @@ if ($result && $result->num_rows > 0) {
             document.getElementById('data').value = data;
             document.getElementById('hora').value = hora;
         }
+        // Quando o modal é aberto, dispare o evento 'change' no select de cliente
+        // caso já tenha um valor pré-selecionado (se o usuário estiver editando, por exemplo)
+        const clienteSelect = document.getElementById('cliente');
+        if (clienteSelect.value) {
+            clienteSelect.dispatchEvent(new Event('change'));
+        }
     }
     
     // Função para fechar o modal
@@ -565,90 +590,72 @@ if ($result && $result->num_rows > 0) {
         const modal = document.getElementById('modalAgendamento');
         modal.style.display = 'none';
         document.getElementById('formAgendamento').reset();
+        // Limpa as opções de pets ao fechar o modal
+        document.getElementById('id_pet').innerHTML = '<option value="">Selecione um pet</option>';
     }
     
-    // Simulação de dados de pets por cliente
-    const petsPorCliente = {
-        '1': [
-            { id: 1, nome: 'Rex (Labrador)' },
-            { id: 2, nome: 'Nina (Gato Persa)' }
-        ],
-        '2': [
-            { id: 3, nome: 'Luna (Poodle)' }
-        ],
-        '3': [
-            { id: 4, nome: 'Mel (Golden Retriever)' },
-            { id: 5, nome: 'Bob (Bulldog)' } // Corrigido
-        ],
-        '4': [
-            { id: 6, nome: 'Thor (Pastor Alemão)' }
-        ]
-    };
-    
-    // Atualiza a lista de pets quando o cliente é selecionado
+    // --- Lógica AJAX para carregar pets ---
+    // CORREÇÃO: Usar o ID correto 'cliente' e 'id_pet'
     document.getElementById('cliente').addEventListener('change', function() {
-        const clienteId = this.value;
-        const petSelect = document.getElementById('pet');
+        const idTutor = this.value;
+        const petSelect = document.getElementById('id_pet'); // CORREÇÃO: ID 'id_pet'
         
-        // Limpa as opções atuais
-        petSelect.innerHTML = '<option value="">Selecione um pet</option>';
-        
-        // Se um cliente foi selecionado, adiciona seus pets
-        if (clienteId && petsPorCliente[clienteId]) {
-            petsPorCliente[clienteId].forEach(pet => {
-                const option = document.createElement('option');
-                option.value = pet.id;
-                option.textContent = pet.nome;
-                petSelect.appendChild(option);
-            });
+        petSelect.innerHTML = '<option value="">Carregando pets...</option>'; // Feedback ao usuário
+        petSelect.disabled = true; // Desabilita enquanto carrega
+
+        if (idTutor) {
+            // CORREÇÃO: Chamada para get_pets.php
+            fetch("get_pets.php?id_tutor=" + idTutor)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    petSelect.innerHTML = '<option value="">Selecione um pet</option>';
+                    if (data.length > 0) {
+                        data.forEach(pet => {
+                            const option = document.createElement('option');
+                            option.value = pet.id_pet; // Assumindo que get_pets.php retorna id_pet
+                            option.textContent = pet.nome; // Assumindo que get_pets.php retorna nome
+                            petSelect.appendChild(option);
+                        });
+                    } else {
+                        petSelect.innerHTML = '<option value="">Nenhum pet encontrado para este tutor</option>';
+                    }
+                    petSelect.disabled = false; // Reabilita
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar pets:', error);
+                    petSelect.innerHTML = '<option value="">Erro ao carregar pets</option>';
+                    petSelect.disabled = false;
+                });
+        } else {
+            petSelect.innerHTML = '<option value="">Selecione um pet</option>';
+            petSelect.disabled = false;
         }
     });
+    // --- Fim Lógica AJAX para carregar pets ---
+
 
     function abrirModalEdicao(id) {
-    // Aqui você pode carregar os dados via AJAX ou passar via PHP
-    alert("Abrir modal para editar agendamento com ID: " + id);
-    // Você pode preencher o modal com os dados do agendamento e mostrar
+        alert("Função de edição ainda não implementada. ID do agendamento: " + id);
+        // Em um projeto real, aqui você faria uma requisição AJAX
+        // para buscar os detalhes do agendamento com 'id' e preencher o modal.
+        // Em seguida, abriria o modal.
     }
 
     function excluirAgendamento(id) {
-    if (confirm("Deseja realmente excluir este agendamento?")) {
-        window.location.href = "agenda.php?excluir=" + id;
+        if (confirm("Tem certeza que deseja excluir este agendamento?")) {
+            window.location.href = "agenda.php?excluir=" + id; // CORREÇÃO: Usar 'excluir'
+        }
     }
-}
-
-    document.getElementById("cliente").addEventListener("change", function() {
-    const idTutor = this.value;
-    const petSelect = document.getElementById("pet");
-
-    petSelect.innerHTML = '<option>Carregando...</option>';
-
-    fetch("get_pets.php?id_tutor=" + idTutor)
-        .then(response => response.json())
-        .then(data => {
-            petSelect.innerHTML = '<option value="">Selecione um pet</option>';
-            data.forEach(pet => {
-                const option = document.createElement("option");
-                option.value = pet.id_pet;
-                option.textContent = pet.nome;
-                petSelect.appendChild(option);
-            });
-        })
-        .catch(() => {
-            petSelect.innerHTML = '<option>Erro ao carregar</option>';
-            });
-    });
     
-    // Manipula o envio do formulário
-    document.getElementById('formAgendamento').addEventListener('submit', function(e) {
-        //e.preventDefault();
-        
-        // Aqui você implementaria a lógica para salvar o agendamento
-        //alert('Agendamento salvo com sucesso!');
-        //fecharModalAgendamento();
-        
-        // Em um sistema real, você recarregaria a página ou atualizaria a visualização
-        //window.location.reload();
-    });
+    // O submit do formulário já é tratado pelo PHP no topo, não precisa de preventDefault aqui
+    // document.getElementById('formAgendamento').addEventListener('submit', function(e) {
+    //     //e.preventDefault(); 
+    // });
     
     // Fecha o modal se o usuário clicar fora dele
     window.addEventListener('click', function(event) {

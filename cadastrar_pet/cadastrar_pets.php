@@ -46,15 +46,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 // Atualiza os dados do pet
                 $sql = "UPDATE Pets SET id_tutor = ?, nome = ?, especie = ?, raca = ?, data_nascimento = ?, sexo = ?, observacoes = ? WHERE id_pet = ?";
                 $stmt = $conn->prepare($sql);
+                // A string de tipos deve ter 8 caracteres: "issssssi"
                 $stmt->bind_param("issssssi", $id_tutor, $nome_pet, $especie, $raca, $data_nascimento, $sexo, $observacoes, $id_pet);
                 $stmt->execute();
             } else {
                 // Insere um novo pet
                 // SQL com 6 placeholders
-                $sql = "INSERT INTO Pets (id_tutor, nome, especie, raca, data_nascimento, sexo, observacoes) VALUES (?, ?, ?, ?, ?, ?)";
+                $sql = "INSERT INTO Pets (id_tutor, nome, especie, raca, data_nascimento, sexo, observacoes) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 $stmt = $conn->prepare($sql);
-                // bind_param com 6 variáveis e 6 tipos
-                $stmt->bind_param("issssss", $id_tutor, $nome_pet, $especie, $raca, $data_nascimento, $sexo, $observacoes);                $stmt->execute();
+                $stmt->bind_param("issssss", $id_tutor, $nome_pet, $especie, $raca, $data_nascimento, $sexo, $observacoes);
+                $stmt->execute(); 
                 $id_pet = $conn->insert_id;
             }
             
@@ -372,8 +373,8 @@ $conn->close();
                         <label for="sexo">Sexo*</label>
                         <select id="sexo" name="sexo" required>
                             <option value="">Selecione</option>
-                            <option value="Macho" <?php echo ($pet_edicao && $pet_edicao['sexo'] == 'Macho') || (isset($_POST['sexo']) && $_POST['sexo'] == 'Macho') ? 'selected' : ''; ?>>Macho</option>
-                            <option value="Fêmea" <?php echo ($pet_edicao && $pet_edicao['sexo'] == 'Fêmea') || (isset($_POST['sexo']) && $_POST['sexo'] == 'Fêmea') ? 'selected' : ''; ?>>Fêmea</option>
+                            <option value="M" <?php echo ($pet_edicao && $pet_edicao['sexo'] == 'M') || (isset($_POST['sexo']) && $_POST['sexo'] == 'M') ? 'selected' : ''; ?>>Macho</option>
+                            <option value="F" <?php echo ($pet_edicao && $pet_edicao['sexo'] == 'F') || (isset($_POST['sexo']) && $_POST['sexo'] == 'F') ? 'selected' : ''; ?>>Fêmea</option>
                         </select>
                     </div>
                     

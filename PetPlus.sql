@@ -1,3 +1,7 @@
+CREATE DATABASE IF NOT EXISTS petplus;
+USE petplus;
+
+-- Tabela de Usuários
 CREATE TABLE IF NOT EXISTS Usuarios (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -161,7 +165,6 @@ CREATE TABLE IF NOT EXISTS Prontuarios (
     FOREIGN KEY (consulta_id) REFERENCES consultas(id) ON DELETE CASCADE,
     FOREIGN KEY (pet_id) REFERENCES Pets(id_pet) ON DELETE CASCADE
 );
-
 
 -- Tabela de Notificacoes
 -- Tabela de Notificacoes

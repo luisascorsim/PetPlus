@@ -4,7 +4,7 @@
 // Configurações de conexão
 $host = "localhost";
 $usuario = "root";
-$senha = "";
+$senha = "PUC@1234";
 
 // Conecta ao servidor MySQL sem selecionar um banco de dados
 $conn = new mysqli($host, $usuario, $senha);

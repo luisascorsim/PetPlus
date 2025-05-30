@@ -622,9 +622,9 @@ if ($result_servicos && $result_servicos->num_rows > 0) {
                 <td>${pagamento}</td>
                 <td>${profissional}</td>
                 <td class="actions">
-                    <button class="btn-action btn-view" title="Visualizar"><i class="fas fa-eye"></i></button>
-                    <button class="btn-action btn-edit" title="Editar"><i class="fas fa-edit"></i></button>
-                    <button class="btn-action btn-delete" title="Excluir"><i class="fas fa-trash"></i></button>
+                    <button class="btn-action btn-view" title="Visualizar">Visualizar<i class="fas fa-eye"></i></button>
+                    <button class="btn-action btn-edit" title="Editar">Editar<i class="fas fa-edit"></i></button>
+                    <button class="btn-action btn-delete" title="Excluir">Excluir<i class="fas fa-trash"></i></button>
                 </td>
             `;
             
