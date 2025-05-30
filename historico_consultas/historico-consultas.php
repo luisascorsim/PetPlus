@@ -8,9 +8,7 @@ if (session_status() == PHP_SESSION_NONE) {
 if (!isset($_SESSION['id_usuario']) && !isset($_SESSION['usuario_id'])) {
     // Para desenvolvimento, criar uma sessão temporária
     $_SESSION['usuario_id'] = 1;
-    $_SESSION['usuario_nome'] = 'Administrador';
-    $_SESSION['usuario_email'] = 'admin@petplus.com';
-    $_SESSION['usuario_tipo'] = 'admin';
+
 }
 
 // Inclui o header e a barra lateral
@@ -44,8 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Formulário de consulta
         $pet_id = (int)$_POST['pet_id'];
         $data = $_POST['data'];
-        $descricao = $_POST['descricao'];
-        $status = $_POST['status'];
+        $observacoes = $_POST['observacoes'];
+        $status = $_POST['status_co'];
         $peso = isset($_POST['peso']) ? (float)$_POST['peso'] : null;
         
         // Validações
@@ -58,25 +56,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
             try {
                 // Inserir consulta
-                $sql = "INSERT INTO Consultas (pet_id, data, descricao, status) VALUES (?, ?, ?, ?)";
+                $sql = "INSERT INTO consultas (pet_id, data_consulta, observacoes, status_co) VALUES (?, ?, ?, ?)";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("isss", $pet_id, $data, $descricao, $status);
+                $stmt->bind_param("isss", $pet_id, $data_consulta, $observacoes, $status_co);
                 $stmt->execute();
                 $consulta_id = $conn->insert_id;
                 
                 // Se tiver peso, registra também
                 if ($peso !== null && $peso > 0) {
-                    $sql_peso = "INSERT INTO pesos (pet_id, data, peso) VALUES (?, ?, ?)";
+                    $sql_peso = "INSERT INTO Peso (pet_id, data_registro, peso) VALUES (?, ?, ?)";
                     $stmt_peso = $conn->prepare($sql_peso);
-                    $stmt_peso->bind_param("isd", $pet_id, $data, $peso);
+                    $stmt_peso->bind_param("isd", $pet_id, $data_registro, $peso);
                     $stmt_peso->execute();
                 }
                 
                 // Se o status for "concluída", adiciona ao prontuário
                 if ($status === 'concluída') {
-                    $sql_prontuario = "INSERT INTO prontuarios (consulta_id, pet_id, data, descricao) VALUES (?, ?, ?, ?)";
+                    $sql_prontuario = "INSERT INTO Prontuarios (consulta_id, pet_id, data_P, descricao) VALUES (?, ?, ?, ?)";
                     $stmt_prontuario = $conn->prepare($sql_prontuario);
-                    $stmt_prontuario->bind_param("iiss", $consulta_id, $pet_id, $data, $descricao);
+                    $stmt_prontuario->bind_param("iiss", $consulta_id, $pet_id, $data_P, $descricao);
                     $stmt_prontuario->execute();
                 }
                 
@@ -106,7 +104,7 @@ try {
             FROM Consultas c
             JOIN Pets p ON c.pet_id = p.id_pet
             JOIN Tutor t ON p.id_tutor = t.id_tutor
-            ORDER BY c.data DESC";
+            ORDER BY c.data_consulta DESC";
     $result = $conn->query($sql);
     
     if ($result && $result->num_rows > 0) {
@@ -126,7 +124,7 @@ try {
             FROM prontuarios pr
             JOIN Pets p ON pr.pet_id = p.id_pet
             JOIN Tutor t ON p.id_tutor = t.id_tutor
-            ORDER BY pr.data DESC";
+            ORDER BY pr.data_P DESC";
     $result = $conn->query($sql);
     
     if ($result && $result->num_rows > 0) {
@@ -364,13 +362,13 @@ $conn->close();
                                     <td><?php echo $consulta['id']; ?></td>
                                     <td><?php echo htmlspecialchars($consulta['pet_nome']); ?></td>
                                     <td><?php echo htmlspecialchars($consulta['tutor_nome']); ?></td>
-                                    <td><?php echo date('d/m/Y H:i', strtotime($consulta['data'])); ?></td>
+                                    <td><?php echo date('d/m/Y H:i', strtotime($consulta['data_consulta'])); ?></td>
                                     <td>
-                                        <span class="status-badge status-<?php echo $consulta['status']; ?>">
-                                            <?php echo ucfirst($consulta['status']); ?>
+                                        <span class="status-badge status-<?php echo $consulta['status_co']; ?>">
+                                            <?php echo ucfirst($consulta['status_co']); ?>
                                         </span>
                                     </td>
-                                    <td><?php echo htmlspecialchars(substr($consulta['descricao'], 0, 50)) . (strlen($consulta['descricao']) > 50 ? '...' : ''); ?></td>
+                                    <td><?php echo htmlspecialchars(substr($consulta['observacoes'], 0, 50)) . (strlen($consulta['observacoes']) > 50 ? '...' : ''); ?></td>
                                     <td>
                                         <button class="btn-action btn-edit" onclick="editarConsulta(<?php echo $consulta['id']; ?>)">Editar</button>
                                         <button class="btn-action btn-delete" onclick="confirmarExclusao(<?php echo $consulta['id']; ?>)">Excluir</button>
@@ -406,7 +404,7 @@ $conn->close();
                                     <td><?php echo $prontuario['id']; ?></td>
                                     <td><?php echo htmlspecialchars($prontuario['pet_nome']); ?></td>
                                     <td><?php echo htmlspecialchars($prontuario['tutor_nome']); ?></td>
-                                    <td><?php echo date('d/m/Y H:i', strtotime($prontuario['data'])); ?></td>
+                                    <td><?php echo date('d/m/Y H:i', strtotime($prontuario['data_P'])); ?></td>
                                     <td><?php echo htmlspecialchars(substr($prontuario['descricao'], 0, 50)) . (strlen($prontuario['descricao']) > 50 ? '...' : ''); ?></td>
                                     <td>
                                         <button class="btn-action btn-edit" onclick="visualizarProntuario(<?php echo $prontuario['id']; ?>)">Visualizar</button>
@@ -437,7 +435,7 @@ $conn->close();
                     
                     <div class="form-group">
                         <label for="data">Data e Hora da Consulta*</label>
-                        <input type="datetime-local" id="data" name="data" required />
+                        <input type="datetime-local" id="data" name="data_consulta" required />
                     </div>
                     
                     <div class="form-group">

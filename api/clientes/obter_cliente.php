@@ -13,8 +13,7 @@ if ($id <= 0) {
 
 try {
     // Buscar dados do cliente
-    $stmt = $pdo->prepare("
-        SELECT c.*, 
+    $stmt = $pdo->prepare("SELECT c.*, 
                (SELECT COUNT(*) FROM pets WHERE cliente_id = c.id) AS qtd_pets
         FROM clientes c
         WHERE c.id = ?

@@ -32,8 +32,7 @@ try {
     $total_consultas = $stmt->fetch()['total'];
     
     // Consultas recentes
-    $stmt = $pdo->prepare("
-        SELECT c.id, c.data_hora, c.status, p.nome as pet_nome, tt.nome as tutor_nome
+    $stmt = $pdo->prepare("SELECT c.id, c.data_hora, c.status, p.nome as pet_nome, tt.nome as tutor_nome
         FROM consultas c
         JOIN pets p ON c.pet_id = p.id
         JOIN tutor cl ON p.tutor_id = tt.id

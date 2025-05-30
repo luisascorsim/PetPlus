@@ -10,10 +10,9 @@ if (!isset($dadosRecebidos['consulta_id']) || !isset($dadosRecebidos['status']))
   exit();
 }
 
-$host = "localhost";
-$usuario = "root";
-$senha = "PUC@1234";
-$banco = "petplus";
+// Inclui o arquivo de conexão
+require_once('../conecta_db.php');
+$conn = conecta_db();
 
 $conn = mysqli_connect($host, $usuario, $senha, $banco);
 

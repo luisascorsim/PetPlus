@@ -6,9 +6,7 @@ session_start();
 if (!isset($_SESSION['usuario_id'])) {
     // Definir uma sessão temporária para desenvolvimento
     $_SESSION['usuario_id'] = 1;
-    $_SESSION['usuario_nome'] = 'Administrador';
-    $_SESSION['usuario_email'] = 'admin@petplus.com';
-    $_SESSION['usuario_tipo'] = 'admin';
+
 }
 
 // Define o caminho base para os recursos

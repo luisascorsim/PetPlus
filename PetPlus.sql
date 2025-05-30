@@ -1,10 +1,3 @@
-CREATE DATABASE IF NOT EXISTS petplus;
-USE petplus;
-
-DROP DATABASE petplus;
-DROP table Consultas;
-
--- Tabela de Usuários
 CREATE TABLE IF NOT EXISTS Usuarios (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -32,8 +25,6 @@ CREATE TABLE IF NOT EXISTS Tutor (
     data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-SELECT * FROM Tutor;
-
 -- Tabela de Pets
 CREATE TABLE IF NOT EXISTS Pets (
     id_pet INT AUTO_INCREMENT PRIMARY KEY,
@@ -43,8 +34,9 @@ CREATE TABLE IF NOT EXISTS Pets (
     raca VARCHAR(50),
     data_nascimento DATE,
     sexo ENUM('M', 'F'),
+    cor VARCHAR(50),
     peso DECIMAL(5,2),
-    observacoes CHAR,
+    observacoes TEXT,
     FOREIGN KEY (id_tutor) REFERENCES Tutor(id_tutor) ON DELETE CASCADE
 );
 
@@ -71,19 +63,16 @@ CREATE TABLE IF NOT EXISTS consultas (
 SELECT * FROM Usuarios WHERE id_usuario IN (1, 2);
 
 -- Tabela de Serviços
-CREATE TABLE Servicos (
+CREATE TABLE IF NOT EXISTS Servicos (
     id_servico INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(255) NOT NULL,
+    nome VARCHAR(100) NOT NULL,
     descricao TEXT,
-    preco DECIMAL(10, 2) NOT NULL,
-    duracao INT NOT NULL COMMENT 'Duração em minutos',
-    categoria VARCHAR(100) NOT NULL, -- Nova coluna para a categoria
-    status_s VARCHAR(50) DEFAULT 'ativo', -- 'ativo' ou 'inativo'
-    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    preco DECIMAL(10,2) NOT NULL,
+    duracao INT,
+    categoria VARCHAR(100) NOT NULL,
+    status_s ENUM('ativo', 'inativo') DEFAULT 'ativo'
 );
 
-SELECT * FROM Servicos;
 
 -- Tabela de Consultas
 CREATE TABLE IF NOT EXISTS Consultas_c (
@@ -159,17 +148,34 @@ CREATE TABLE IF NOT EXISTS Agendamentos (
     FOREIGN KEY (id_servico) REFERENCES Servicos(id_servico) ON DELETE CASCADE
 );
 
--- Tabela de Prontuarios
+SELECT * FROM Agendamentos;
+-- Tabela de prontuarios
 CREATE TABLE IF NOT EXISTS Prontuarios (
     id_prontuario INT AUTO_INCREMENT PRIMARY KEY,
     consulta_id INT NOT NULL,
     pet_id INT NOT NULL,
-    data DATETIME NOT NULL COMMENT 'Data e hora do registro no prontuário',
+    data_P DATETIME NOT NULL COMMENT 'Data e hora do registro no prontuário',
     descricao TEXT NOT NULL COMMENT 'Descrição detalhada do registro no prontuário',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (consulta_id) REFERENCES consultas(id) ON DELETE CASCADE,
     FOREIGN KEY (pet_id) REFERENCES Pets(id_pet) ON DELETE CASCADE
+);
+
+
+-- Tabela de Notificacoes
+-- Tabela de Notificacoes
+CREATE TABLE IF NOT EXISTS Notificacoes (
+    id_notificacao INT AUTO_INCREMENT PRIMARY KEY,
+    remetente_id_usuario INT NOT NULL COMMENT 'ID do usuário que ENVIOU a notificação',
+    id_usuario INT NOT NULL COMMENT 'ID do usuário que RECEBERÁ a notificação (destinatário)',
+    titulo VARCHAR(255) NOT NULL,
+    mensagem TEXT NOT NULL,
+    lida TINYINT(1) NOT NULL DEFAULT 0 COMMENT '0 = não lida, 1 = lida (pelo destinatário)',
+    data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+    data_visualizacao DATETIME DEFAULT NULL,
+    FOREIGN KEY (remetente_id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE CASCADE
 );
 
 -- Inserir dados de exemplo para usuário administrador
@@ -198,11 +204,11 @@ VALUES
 (1, '2023-07-20 11:00:00', 'Consulta de rotina', NULL, NULL, NULL, 2, 'agendada');
 
 -- Inserir dados de exemplo para serviços
-INSERT INTO Servicos (nome, descricao, preco, duracao) VALUES
-('Consulta Veterinária', 'Consulta de rotina com veterinário', 150.00, 30),
-('Banho e Tosa', 'Serviço completo de higiene', 80.00, 60),
-('Vacinação', 'Aplicação de vacinas', 120.00, 15),
-('Exame de Sangue', 'Hemograma completo', 200.00, 20);
+INSERT INTO Servicos (nome, descricao, preco, duracao, categoria) VALUES
+('Consulta Veterinária', 'Consulta de rotina com veterinário', 150.00, 30, 'M'),
+('Banho e Tosa', 'Serviço completo de higiene', 80.00, 60, 'A'),
+('Vacinação', 'Aplicação de vacinas', 120.00, 15, 'S'),
+('Exame de Sangue', 'Hemograma completo', 200.00, 20, 'L');
 
 -- Inserir dados de exemplo para consultas
 INSERT INTO Consultas_c (pet_id, data_c, descricao, status_c) VALUES
