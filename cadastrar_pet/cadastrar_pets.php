@@ -1,16 +1,14 @@
 <?php
-// Inicia a sessão e verifica login
+
 session_start();
 if (!isset($_SESSION['id_usuario'])) {
     header('Location: ../Tela_de_site/login.php');
     exit();
 }
 
-// Inclui o header e a barra lateral
 require_once('../includes/header.php');
 require_once('../includes/sidebar.php');
 
-// Inclui o arquivo de conexão
 require_once('../conecta_db.php');
 $conn = conecta_db();
 
