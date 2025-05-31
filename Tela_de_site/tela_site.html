@@ -34,7 +34,6 @@
             pointer-events: none;
         }
 
-        /* Header */
         .header {
             background-color: #2196f3;
             padding: 1rem 0;
@@ -103,7 +102,6 @@
             background: rgba(255,255,255,0.3);
         }
 
-        /* Hero Section */
         .hero {
             max-width: 1200px;
             margin: 0 auto;
@@ -166,7 +164,6 @@
             color: white;
         }
 
-        /* Funcionalidades Section */
         .funcionalidades {
             max-width: 1200px;
             margin: 0 auto;
@@ -269,7 +266,6 @@
             line-height: 1.6;
         }
 
-        /* Footer */
         .footer {
             background: #333;
             color: white;
@@ -303,7 +299,7 @@
             color: #ccc;
         }
 
-        /* Responsive */
+        /* Responsividade */
         @media (max-width: 768px) {
             .header-container {
                 padding: 0 1rem;
@@ -347,10 +343,7 @@
     </style>
 </head>
 <body>
-    <!-- Imagem de fundo -->
     <img src="gatoecao.jpg" alt="" class="background-image">
-
-    <!-- Header -->
     <header class="header">
         <div class="header-container">
             <div class="logo">
@@ -363,8 +356,6 @@
             </nav>
         </div>
     </header>
-
-    <!-- Hero Section -->
     <section class="hero">
         <h1>
             Mais organizado,<br>
@@ -380,7 +371,6 @@
         </div>
     </section>
 
-    <!-- Funcionalidades Section -->
     <section class="funcionalidades">
         <div class="section-header">
             <h2>Funcionalidades</h2>
@@ -390,7 +380,6 @@
                 Explore as funcionalidades abaixo para acessar o que precisa!
             </p>
         </div>
-
         <div class="cards-grid">
             <div class="card">
                 <div class="card-header">
@@ -441,8 +430,6 @@
             </div>
         </div>
     </section>
-
-    <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-logo">
@@ -454,7 +441,6 @@
     </footer>
 
     <script>
-        // Adiciona animação suave ao scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -464,7 +450,6 @@
             });
         });
 
-        
         const observerOptions = {
             threshold: 0.1,
             rootMargin: '0px 0px -50px 0px'
@@ -479,7 +464,7 @@
             });
         }, observerOptions);
 
-        
+
         document.addEventListener('DOMContentLoaded', () => {
             const cards = document.querySelectorAll('.card');
             cards.forEach(card => {
