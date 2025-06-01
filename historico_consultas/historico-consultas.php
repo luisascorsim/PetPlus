@@ -511,7 +511,7 @@ $conn->close();
             </div>
             
             <div id="tab-consultas" class="tab-content active">
-                <h2>Consultas Agendadas</h2>
+                <h2>Histórico de Consultas</h2>
                 <table>
                     <thead>
                         <tr>
@@ -564,7 +564,7 @@ $conn->close();
                             <th>Pet</th>
                             <th>Tutor</th>
                             <th>Data</th>
-                            <th>Descrição</th>
+                            <th>Diagnóstico</th>
                             <th>Ações</th>
                         </tr>
                     </thead>

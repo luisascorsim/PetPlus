@@ -1,5 +1,4 @@
 <?php
-// Inicia a sessão se ainda não estiver iniciada
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
@@ -17,15 +16,12 @@ function determinarCaminhoBase() {
     // Determina quantos níveis precisamos voltar para chegar à raiz do projeto
     $niveis = 0;
     if ($diretorioAtual != 'PetPlus' && $diretorioAtual != '') {
-        $niveis = 1; // Por padrão, volta um nível (para a maioria dos diretórios)
-        
-        // Casos especiais para subdiretórios mais profundos
+        $niveis = 1; 
         if (in_array('perfil', $partesCaminho) || in_array('configuracoes', $partesCaminho)) {
             $niveis = 1;
         }
     }
     
-    // Constrói o caminho base
     $caminhoBase = '';
     for ($i = 0; $i < $niveis; $i++) {
         $caminhoBase .= '../';
@@ -48,6 +44,10 @@ $nomeUsuario = isset($_SESSION['nome']) ? $_SESSION['nome'] : 'Usuário';
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?php echo $caminhoBase; ?>includes/temas.css">
     <link rel="stylesheet" href="<?php echo $caminhoBase; ?>includes/global.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
     <style>
         .header {
             background-color: #2196f3;
@@ -97,6 +97,7 @@ $nomeUsuario = isset($_SESSION['nome']) ? $_SESSION['nome'] : 'Usuário';
             width: 24px;
             height: 24px;
             cursor: pointer;
+            vertical-align: middle;
         }
         
         .dropdown-content {
@@ -131,29 +132,23 @@ $nomeUsuario = isset($_SESSION['nome']) ? $_SESSION['nome'] : 'Usuário';
             font-weight: 600;
         }
         
-        /* Responsividade */
         @media (max-width: 768px) {
             .header {
                 padding: 10px;
             }
-            
             .logo img {
                 height: 30px;
             }
-            
             .logo span {
                 font-size: 16px;
             }
-            
             .usuario-acoes {
                 gap: 10px;
             }
-            
             .dropdown-icon {
                 width: 20px;
                 height: 20px;
             }
-            
             .usuario-nome {
                 display: none;
             }
@@ -162,7 +157,7 @@ $nomeUsuario = isset($_SESSION['nome']) ? $_SESSION['nome'] : 'Usuário';
 </head>
 <body>
     <header class="header">
-        <a href="<?php echo $caminhoBase; ?>home/index.php" class="logo">
+        <a href="<?php echo $caminhoBase; ?>home/index.php" class="logo nav-link">
             <img src="<?php echo $caminhoBase; ?>Imagens/logo.png" alt="PetPlus Logo">
             <span>PetPlus</span>
         </a>
@@ -173,24 +168,103 @@ $nomeUsuario = isset($_SESSION['nome']) ? $_SESSION['nome'] : 'Usuário';
             <div class="dropdown">
                 <img src="<?php echo $caminhoBase; ?>Imagens/usuario.png" alt="Usuário" class="dropdown-icon">
                 <div class="dropdown-content">
-                    <a href="<?php echo $caminhoBase; ?>perfil/meu-perfil.php">Meu Perfil</a>
-                    <a href="<?php echo $caminhoBase; ?>perfil/alterar-senha.php">Alterar Senha</a>
+                    <a href="<?php echo $caminhoBase; ?>perfil/meu-perfil.php" class="nav-link">Meu Perfil</a>
+                    <a href="<?php echo $caminhoBase; ?>perfil/alterar-senha.php" class="nav-link">Alterar Senha</a>
                 </div>
             </div>
             
             <div class="dropdown">
                 <img src="<?php echo $caminhoBase; ?>Imagens/config.png" alt="Configurações" class="dropdown-icon">
                 <div class="dropdown-content">
-                    <a href="<?php echo $caminhoBase; ?>configuracoes/sistema.php">Configurações do Sistema</a>
-                    <a href="<?php echo $caminhoBase; ?>configuracoes/notificacoes.php">Notificações</a>
+                    <a href="<?php echo $caminhoBase; ?>configuracoes/sistema.php" class="nav-link">Configurações do Sistema</a>
+                    <a href="<?php echo $caminhoBase; ?>configuracoes/notificacoes.php" class="nav-link">Notificações</a>
                 </div>
             </div>
             
-            <a href="<?php echo $caminhoBase; ?>home/logout.php">
+            <a href="<?php echo $caminhoBase; ?>home/logout.php" id="logout-link" title="Sair">
                 <img src="<?php echo $caminhoBase; ?>Imagens/sair.png" alt="Sair" class="dropdown-icon">
             </a>
         </div>
     </header>
 
-    <!-- Script para o header -->
     <script src="<?php echo $caminhoBase; ?>includes/header.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Lógica para confirmação de logout
+        const logoutButton = document.getElementById('logout-link');
+        if (logoutButton) {
+            const logoutUrl = logoutButton.href; // Pega a URL original do link
+            logoutButton.addEventListener('click', function(event) {
+                event.preventDefault(); // Previne o comportamento padrão do link
+
+                Swal.fire({
+                    title: 'Confirmar Saída',
+                    text: "Você realmente deseja sair do sistema?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#0b3556',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sim, Sair!',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true // Coloca o botão de confirmação à direita
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Saindo...',
+                            text: 'Aguarde um momento.',
+                            icon: 'info',
+                            timer: 1000, // 1 segundo para o usuário ver
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            },
+                            // Redireciona após o timer
+                            didClose: () => {
+                                window.location.href = logoutUrl;
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        const headerNavLinks = document.querySelectorAll('.header a.nav-link'); 
+        headerNavLinks.forEach(link => {
+            if (link.href && link.getAttribute('href') !== '#' && !link.getAttribute('href').startsWith('javascript:')) {
+                link.addEventListener('click', function(event) {
+                    event.preventDefault(); 
+                    const targetUrl = this.href;
+                    
+                    let linkDescription = 'a página solicitada';
+                    if (this.textContent.trim()) {
+                        linkDescription = `"${this.textContent.trim()}"`;
+                    } else if (this.querySelector('img') && this.querySelector('img').alt) {
+                        linkDescription = `"${this.querySelector('img').alt}"`;
+                    } else if (this.title) {
+                        linkDescription = `"${this.title}"`;
+                    }
+
+                    Swal.fire({
+                        title: 'Redirecionando...',
+                        html: `Aguarde, estamos te levando para ${linkDescription}.`,
+                        icon: 'info',
+                        timer: 700, 
+                        showConfirmButton: false,
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        },
+                        // Redireciona após o timer
+                        didClose: () => {
+                             window.location.href = targetUrl;
+                        }
+                    });
+                });
+            }
+        });
+    });
+    </script>
+</body>
+</html>
