@@ -59,6 +59,10 @@ function isActive($pagina) {
                 <i class="fas fa-concierge-bell"></i>
                 <span>Serviços</span>
             </a>
+            <a href="<?php echo $caminhoBase; ?>funcionarios/funcionarios.php" class="menu-item <?php echo isActive('funcionarios/funcionarios.php'); ?>">
+                <i class="fas fa-concierge-bell"></i>
+                <span>Funcionarios</span>
+            </a>
         </div>
         
         <div class="menu-category">
@@ -67,12 +71,16 @@ function isActive($pagina) {
                 <i class="fas fa-clipboard-list"></i>
                 <span>Consultas</span>
             </a>
-            <a href="<?php echo $caminhoBase; ?>agenda/agenda.php" class="menu-item <?php echo isActive('fa-clipboard-list'); ?>">
+            <a href="<?php echo $caminhoBase; ?>alergias/alergias.php" class="menu-item <?php echo isActive('alergias/alergias.php'); ?>">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Condições</span>
+            </a>
+            <a href="<?php echo $caminhoBase; ?>agenda/agenda.php" class="menu-item <?php echo isActive('agenda/agenda.php'); ?>">
                 <i class="fas fa-clipboard-list"></i>
                 <span>Agenda</span>
             </a>
-            <a href="<?php echo $caminhoBase; ?>vacinas/vacinas.php" class="menu-item <?php echo isActive('vacinas_e_controle_do_peso/vacinas-peso.php'); ?>">
-                <i class="fas fa-syringe"></i>
+            <a href="<?php echo $caminhoBase; ?>vacinas/vacinas.php" class="menu-item <?php echo isActive('vacinas/vacinas.php'); ?>">
+                <i class="fas fa-clipboard-list"></i>
                 <span>Vacinas</span>
             </a>
             <a href="<?php echo $caminhoBase; ?>estoque/estoque.php" class="menu-item <?php echo isActive('estoque/estoque.php'); ?>">
@@ -83,8 +91,8 @@ function isActive($pagina) {
         
         <div class="menu-category">
             <h3 class="category-title">Financeiro</h3>
-            <a href="<?php echo $caminhoBase; ?>fatura_detalhada/gerenciamento_faturas.php" class="menu-item <?php echo isActive('fatura_detalhada/fatura-detalhada.php'); ?>">
-                <i class="fas fa-file-invoice-dollar"></i>
+            <a href="<?php echo $caminhoBase; ?>fatura_detalhada/gerenciamento_faturas.php" class="menu-item <?php echo isActive('fatura_detalhada/gerenciamento_faturas.php'); ?>">
+                <i class="fas fa-chart-bar"></i>
                 <span>Faturas</span>
             </a>
             <a href="<?php echo $caminhoBase; ?>relatorio_atendimentos/relatorio-atendimentos.php" class="menu-item <?php echo isActive('relatorio_atendimentos/relatorio-atendimentos.php'); ?>">

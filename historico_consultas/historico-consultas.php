@@ -1,5 +1,4 @@
 <?php
-// Inicia a sessão apenas se ainda não estiver ativa
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
@@ -55,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     
                     // Se o status for "concluida", adiciona ao prontuário automaticamente
                     if ($status_co === 'concluida') {
-                        $sql_prontuario = "INSERT INTO Prontuarios (consulta_id, pet_id, data, descricao) VALUES (?, ?, ?, ?)";
+                        $sql_prontuario = "INSERT INTO Prontuarios (consulta_id, pet_id, data_P, descricao) VALUES (?, ?, ?, ?)";
                         $stmt_prontuario = $conn->prepare($sql_prontuario);
                         $descricao_prontuario = "Consulta: " . $motivo . "\nObservações: " . $observacoes;
                         $stmt_prontuario->bind_param("iiss", $consulta_id, $pet_id, $data_consulta, $descricao_prontuario);
@@ -116,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $result_check = $stmt_check->get_result();
                     
                     if ($result_check->num_rows == 0) {
-                        $sql_prontuario = "INSERT INTO Prontuarios (consulta_id, pet_id, data, descricao) VALUES (?, ?, ?, ?)";
+                        $sql_prontuario = "INSERT INTO Prontuarios (consulta_id, pet_id, data_P, descricao) VALUES (?, ?, ?, ?)";
                         $stmt_prontuario = $conn->prepare($sql_prontuario);
                         $descricao_prontuario = "Consulta: " . $motivo;
                         if (!empty($diagnostico)) $descricao_prontuario .= "\nDiagnóstico: " . $diagnostico;
@@ -144,13 +143,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } elseif ($acao == 'editar_prontuario') {
             // Editar prontuário
             $id = (int)$_POST['id'];
-            $data = $_POST['data'];
+            $data = $_POST['data_P'];
             $descricao = $_POST['descricao'];
             
             try {
-                $sql = "UPDATE Prontuarios SET data = ?, descricao = ? WHERE id_prontuario = ?";
+                $sql = "UPDATE Prontuarios SET data_P = ?, descricao = ? WHERE id_prontuario = ?";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("ssi", $data, $descricao, $id);
+                $stmt->bind_param("ssi", $data_P, $descricao, $id);
                 $stmt->execute();
                 
                 $_SESSION['mensagem'] = "Prontuário atualizado com sucesso!";
@@ -272,7 +271,7 @@ try {
             JOIN Pets p ON pr.pet_id = p.id_pet
             JOIN Tutor t ON p.id_tutor = t.id_tutor
             LEFT JOIN consultas c ON pr.consulta_id = c.id
-            ORDER BY pr.data DESC";
+            ORDER BY pr.data_P DESC";
     $result = $conn->query($sql);
     
     if ($result && $result->num_rows > 0) {
@@ -579,7 +578,7 @@ $conn->close();
                                     <td><?php echo $prontuario['id_prontuario']; ?></td>
                                     <td><?php echo htmlspecialchars($prontuario['pet_nome']); ?></td>
                                     <td><?php echo htmlspecialchars($prontuario['tutor_nome']); ?></td>
-                                    <td><?php echo date('d/m/Y H:i', strtotime($prontuario['data'])); ?></td>
+                                    <td><?php echo date('d/m/Y H:i', strtotime($prontuario['data_P'])); ?></td>
                                     <td><?php echo htmlspecialchars(substr($prontuario['descricao'], 0, 50)) . (strlen($prontuario['descricao']) > 50 ? '...' : ''); ?></td>
                                     <td>
                                         <button class="btn-action btn-edit" onclick="editarProntuario(<?php echo $prontuario['id_prontuario']; ?>)">Editar</button>
@@ -676,7 +675,7 @@ $conn->close();
                         
                         <div class="form-group">
                             <label for="data">Data e Hora*</label>
-                            <input type="datetime-local" id="data" name="data" value="<?php echo date('Y-m-d\TH:i', strtotime($prontuario_edicao['data'])); ?>" required />
+                            <input type="datetime-local" id="data_P" name="data_P" value="<?php echo date('Y-m-d\TH:i', strtotime($prontuario_edicao['data_P'])); ?>" required />
                         </div>
                         
                         <div class="form-group">
