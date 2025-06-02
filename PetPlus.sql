@@ -167,7 +167,6 @@ CREATE TABLE IF NOT EXISTS Prontuarios (
 );
 
 -- Tabela de Notificacoes
--- Tabela de Notificacoes
 CREATE TABLE IF NOT EXISTS Notificacoes (
     id_notificacao INT AUTO_INCREMENT PRIMARY KEY,
     remetente_id_usuario INT NOT NULL COMMENT 'ID do usuário que ENVIOU a notificação',
@@ -180,6 +179,23 @@ CREATE TABLE IF NOT EXISTS Notificacoes (
     FOREIGN KEY (remetente_id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE CASCADE,
     FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS estoque (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        nome VARCHAR(100) NOT NULL,
+        categoria ENUM('Medicamento', 'Insumo Médico', 'Produto de Higiene', 'Alimento', 'Outro') NOT NULL,
+        descricao TEXT,
+        quantidade_atual INT NOT NULL DEFAULT 0,
+        quantidade_minima INT NOT NULL DEFAULT 5,
+        quantidade_maxima INT NOT NULL DEFAULT 100,
+        unidade_medida VARCHAR(20) NOT NULL,
+        preco_unitario DECIMAL(10,2) NOT NULL,
+        data_validade DATE,
+        fornecedor VARCHAR(100),
+        localizacao VARCHAR(100),
+        data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    );
 
 -- Inserir dados de exemplo para usuário administrador
 INSERT INTO Usuarios (nome, email, senha, cpf, data_nasc) VALUES

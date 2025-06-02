@@ -75,6 +75,10 @@ function isActive($pagina) {
                 <i class="fas fa-syringe"></i>
                 <span>Vacinas</span>
             </a>
+            <a href="<?php echo $caminhoBase; ?>estoque/estoque.php" class="menu-item <?php echo isActive('estoque/estoque.php'); ?>">
+                <i class="fas fa-syringe"></i>
+                <span>Estoque</span>
+            </a>
         </div>
         
         <div class="menu-category">
